@@ -9,7 +9,7 @@ import { projects } from './projects.js';
 import ProjectModal from './components/ProjectModal';
 
 // ★ 这里修改为你的阿里云 ECS 公网 IP (开发时如果本地测试可以用 localhost)
-const API_URL = 'http://101.200.13.100:3000/api/contact';
+const API_URL = '/api/contact';
 
 const App = () => {
     const [activeTab, setActiveTab] = useState('all');

@@ -7,9 +7,6 @@ const { Resend } = require('resend');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ★ 关键设置：信任 Nginx 反向代理，否则 req.ip 永远是 127.0.0.1
-app.set('trust proxy', 1);
-
 // 初始化 Resend
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -17,24 +14,21 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // --- 限流配置 ---
-const IP_LIMIT_WINDOW = 5 * 60 * 1000; // 单IP窗口：5分钟
-const GLOBAL_LIMIT_WINDOW = 60 * 60 * 1000; // 全局窗口：1小时
-const GLOBAL_MAX_REQUESTS = 100; // 全局最大请求数
+const IP_LIMIT_WINDOW = 5 * 60 * 1000; // 5分钟
+const GLOBAL_LIMIT_WINDOW = 60 * 60 * 1000; // 1小时
+const GLOBAL_MAX_REQUESTS = 100;
 
-// --- 内存存储 (生产环境建议用 Redis，但简单场景内存足够) ---
-const ipRequests = new Map(); // 存储 { ip: timestamp }
-let globalRequests = []; // 存储 [timestamp, timestamp, ...]
+const ipRequests = new Map();
+let globalRequests = [];
 
-// 定时清理过期的记录 (防止内存泄漏)
+// 定时清理
 setInterval(() => {
     const now = Date.now();
-    // 清理 IP 记录
     for (const [ip, time] of ipRequests.entries()) {
         if (now - time > IP_LIMIT_WINDOW) ipRequests.delete(ip);
     }
-    // 清理全局记录
     globalRequests = globalRequests.filter(t => now - t < GLOBAL_LIMIT_WINDOW);
-}, 60 * 1000); // 每分钟清理一次
+}, 60 * 1000);
 
 app.get('/', (req, res) => {
     res.send('Portfolio API is running...');
@@ -42,33 +36,36 @@ app.get('/', (req, res) => {
 
 app.post('/api/contact', async (req, res) => {
     const now = Date.now();
-    // 获取真实 IP (兼容 Nginx 和直接访问)
-    const ip = req.ip || req.connection.remoteAddress;
+
+    // ★ 关键修改：获取真实 IP ★
+    // 优先读取 Cloudflare 传过来的 'x-forwarded-for'，如果没有则读取直接连接的 IP
+    const forwardedIP = req.headers['x-forwarded-for'];
+    // 如果有多个代理，x-forwarded-for 可能是 "IP1, IP2"，我们取第一个
+    const realIP = forwardedIP ? forwardedIP.split(',')[0].trim() : (req.ip || req.connection.remoteAddress);
 
     // --- 1. 全局限流检查 ---
-    // 先过滤掉1小时前的请求
     globalRequests = globalRequests.filter(t => now - t < GLOBAL_LIMIT_WINDOW);
     if (globalRequests.length >= GLOBAL_MAX_REQUESTS) {
-        console.warn(`[Rate Limit] Global limit reached. IP: ${ip}`);
+        console.warn(`[Rate Limit] Global limit reached. IP: ${realIP}`);
         return res.status(429).json({ success: false, msg: '服务器繁忙，请稍后再试' });
     }
 
     // --- 2. 单 IP 限流检查 ---
-    const lastRequestTime = ipRequests.get(ip);
+    const lastRequestTime = ipRequests.get(realIP);
     if (lastRequestTime && now - lastRequestTime < IP_LIMIT_WINDOW) {
         const remainingSeconds = Math.ceil((IP_LIMIT_WINDOW - (now - lastRequestTime)) / 1000);
-        console.warn(`[Rate Limit] IP limit hit: ${ip}`);
+        console.warn(`[Rate Limit] IP limit hit: ${realIP}`);
         return res.status(429).json({ success: false, msg: `发送太频繁，请等待 ${remainingSeconds} 秒后再试` });
     }
 
-    // --- 3. 正常业务逻辑 ---
+    // --- 3. 业务逻辑 ---
     const { name, email, message } = req.body;
 
     if (!name || !email || !message) {
         return res.status(400).json({ success: false, msg: '请填写完整信息' });
     }
 
-    console.log(`[New Message] From: ${name} (${email}) IP: ${ip}`);
+    console.log(`[New Message] From: ${name} (${email}) RealIP: ${realIP}`);
 
     try {
         const { data, error } = await resend.emails.send({
@@ -81,7 +78,7 @@ app.post('/api/contact', async (req, res) => {
                     <h2 style="color: #4f46e5; margin-bottom: 20px;">收到新的联系请求</h2>
                     <p><strong>姓名：</strong> ${name}</p>
                     <p><strong>邮箱：</strong> <a href="mailto:${email}">${email}</a></p>
-                    <p><strong>IP来源：</strong> ${ip}</p>
+                    <p><strong>真实IP：</strong> ${realIP}</p>
                     <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
                     <p style="font-weight: bold; color: #555;">消息内容：</p>
                     <div style="background: #f9fafb; padding: 15px; border-radius: 6px; white-space: pre-wrap; color: #333;">${message}</div>
@@ -94,8 +91,8 @@ app.post('/api/contact', async (req, res) => {
             return res.status(500).json({ success: false, msg: '邮件服务暂时不可用' });
         }
 
-        // --- 4. 记录请求 (成功后才记录) ---
-        ipRequests.set(ip, now);
+        // 记录请求 (使用真实IP)
+        ipRequests.set(realIP, now);
         globalRequests.push(now);
 
         console.log('Email sent successfully:', data.id);
