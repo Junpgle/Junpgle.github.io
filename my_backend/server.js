@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const { Resend } = require('resend');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // 初始化 Resend
 const resend = new Resend(process.env.RESEND_API_KEY);
