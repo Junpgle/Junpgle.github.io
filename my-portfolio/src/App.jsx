@@ -1,66 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Github,
-    ArrowRight,
-    X,
-    Database,
-    BrainCircuit,
-    Cpu,
-    Binary,
-    Terminal,
-    Activity,
-    Mail,
-    Send,
-    Bot,
-    CheckCircle2,
-    Loader2,
-    AlertCircle,
-    Code,
-    Zap,
-    ExternalLink,
-    Music,
-    Mic2,
-    Moon,
-    Sun,
-    Monitor
+    Github, ArrowRight, Database, BrainCircuit, Binary, Terminal, Bot,
+    Mail, Send, Loader2, Code, Zap, Music, Moon, Sun, Monitor, AlertCircle, CheckCircle2
 } from 'lucide-react';
-// 引入分离的项目数据文件
+
+// 引入拆分的数据和组件
 import { projects } from './projects';
+import ProjectModal from './components/ProjectModal';
+
+// ★ 这里修改为你的阿里云 ECS 公网 IP
+const API_URL = 'http://101.200.13.100:3000/api/contact';
 
 const App = () => {
     const [activeTab, setActiveTab] = useState('all');
     const [selectedProject, setSelectedProject] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
+
+    // 表单状态: idle | loading | success | error
     const [formState, setFormState] = useState('idle');
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
-    // 主题状态: 'light', 'dark', 'system'
+    // 主题状态
     const [theme, setTheme] = useState('system');
     const [isDark, setIsDark] = useState(false);
 
-    // 初始化加载与主题检测
+    // 初始化
     useEffect(() => {
         setIsLoaded(true);
-
-        // 读取本地存储的主题
         const savedTheme = localStorage.getItem('theme') || 'system';
         setTheme(savedTheme);
-
-        // 应用主题
         applyTheme(savedTheme);
 
-        // 监听系统主题变化
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleChange = () => {
-            if (savedTheme === 'system') {
-                applyTheme('system');
-            }
+        const handleChange = (e) => {
+            if (savedTheme === 'system') applyTheme('system');
         };
         mediaQuery.addEventListener('change', handleChange);
         return () => mediaQuery.removeEventListener('change', handleChange);
     }, []);
 
-    // 应用主题逻辑
     const applyTheme = (selectedTheme) => {
         let shouldBeDark = false;
         if (selectedTheme === 'system') {
@@ -68,22 +46,15 @@ const App = () => {
         } else {
             shouldBeDark = selectedTheme === 'dark';
         }
-
         setIsDark(shouldBeDark);
-        if (shouldBeDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        document.documentElement.classList.toggle('dark', shouldBeDark);
     };
 
-    // 切换主题处理
     const toggleTheme = () => {
         let newTheme;
         if (theme === 'light') newTheme = 'dark';
         else if (theme === 'dark') newTheme = 'system';
         else newTheme = 'light';
-
         setTheme(newTheme);
         localStorage.setItem('theme', newTheme);
         applyTheme(newTheme);
@@ -94,22 +65,34 @@ const App = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    // --- 核心：连接后端 ECS ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.name || !formData.email || !formData.message) return;
+
         setFormState('loading');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setFormState('success');
-    };
 
-    const openMailClient = () => {
-        const mailtoUrl = `mailto:junpgle@qq.com?subject=Message from ${formData.name}&body=${encodeURIComponent(formData.message)}%0A%0AContact: ${formData.email}`;
-        window.open(mailtoUrl, '_self');
-    };
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
 
-    const resetForm = () => {
-        setFormData({ name: '', email: '', message: '' });
-        setFormState('idle');
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                setFormState('success');
+                setFormData({ name: '', email: '', message: '' }); // 清空
+                // 3秒后重置按钮状态，方便再次发送
+                setTimeout(() => setFormState('idle'), 5000);
+            } else {
+                throw new Error(data.msg || '发送失败');
+            }
+        } catch (error) {
+            console.error('API Error:', error);
+            setFormState('error');
+        }
     };
 
     const filteredProjects = activeTab === 'all'
@@ -125,16 +108,11 @@ const App = () => {
                 .animate-reveal { animation: reveal 1s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
                 .animate-float { animation: float 6s ease-in-out infinite; }
                 .animate-drift { animation: drift 8s ease-in-out infinite; }
-                /* 隐藏滚动条但保留功能 */
                 .scrollbar-hide::-webkit-scrollbar { display: none; }
                 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-                ::-webkit-scrollbar { width: 6px; }
-                ::-webkit-scrollbar-track { background: transparent; }
-                ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-                .dark ::-webkit-scrollbar-thumb { background: #334155; }
             `}</style>
 
-            {/* 导航 */}
+            {/* Navigation */}
             <nav className={`fixed top-0 w-full z-50 border-b backdrop-blur-md transition-colors duration-300 ${isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-white/80 border-slate-200/50'}`}>
                 <div className="max-w-7xl mx-auto px-6 md:px-8 h-16 md:h-20 flex items-center justify-between">
                     <div className="flex items-center space-x-3 group cursor-pointer">
@@ -153,12 +131,7 @@ const App = () => {
                             </a>
                         </div>
 
-                        {/* 主题切换按钮 */}
-                        <button
-                            onClick={toggleTheme}
-                            className={`p-2 rounded-full transition-all duration-300 hover:scale-110 ${isDark ? 'bg-slate-800 text-yellow-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-                            title={`Current: ${theme} mode`}
-                        >
+                        <button onClick={toggleTheme} className={`p-2 rounded-full transition-all duration-300 hover:scale-110 ${isDark ? 'bg-slate-800 text-yellow-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
                             {theme === 'light' && <Sun className="w-4 h-4" />}
                             {theme === 'dark' && <Moon className="w-4 h-4" />}
                             {theme === 'system' && <Monitor className="w-4 h-4" />}
@@ -169,7 +142,7 @@ const App = () => {
 
             {/* Hero Section */}
             <section className={`relative min-h-screen flex items-center px-6 md:px-8 overflow-hidden transition-colors duration-300 ${isDark ? 'bg-slate-950' : 'bg-white'}`}>
-                <div className={`absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:40px_40px] opacity-30 transition-colors duration-300`}></div>
+                <div className={`absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:40px_40px] opacity-30`}></div>
                 <div className={`absolute top-[10%] right-[5%] w-[300px] md:w-[400px] h-[300px] md:h-[400px] rounded-full blur-[80px] md:blur-[100px] pointer-events-none transition-colors duration-300 ${isDark ? 'bg-indigo-900/20' : 'bg-indigo-50'}`}></div>
 
                 <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center pt-20">
@@ -179,9 +152,9 @@ const App = () => {
                                 IST Sophomore
                             </span>
                         </div>
-                        <h1 className={`text-5xl sm:text-7xl md:text-8xl lg:text-[9rem] xl:text-[10rem] font-black tracking-tighter leading-[0.9] mb-8 break-words transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        <h1 className={`text-5xl sm:text-7xl md:text-8xl lg:text-[9rem] xl:text-[10rem] font-black tracking-tighter leading-[0.9] mb-8 break-words transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}>
                             HI,<br />
-                            I'M <span className="text-indigo-500 dark:text-indigo-400">JUNPGLE</span>
+                            I'M <span className="text-indigo-500 dark:text-indigo-400 whitespace-nowrap inline-block">JUNPGLE</span>
                         </h1>
                         <div className="flex items-center space-x-4 mt-8 md:mt-12">
                             <div className={`h-px w-8 md:w-12 transition-colors ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
@@ -194,19 +167,16 @@ const App = () => {
                             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 md:h-48 h-32 md:w-48 border shadow-2xl rounded-[2rem] md:rounded-[3rem] flex items-center justify-center animate-float transition-colors duration-300 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
                                 <BrainCircuit className={`w-12 md:w-20 h-12 md:h-20 opacity-80 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`} />
                             </div>
-                            <div className={`absolute top-4 md:top-10 left-4 md:left-10 p-4 md:p-6 border shadow-xl rounded-xl md:rounded-2xl animate-drift transition-colors duration-300 ${isDark ? 'bg-slate-900 border-slate-800 text-slate-500' : 'bg-white border-slate-50 text-slate-400'}`}>
-                                <Code className="w-4 md:w-6 h-4 md:h-6" />
-                            </div>
-                            <div className={`absolute bottom-4 md:bottom-10 right-4 md:right-10 p-4 md:p-6 border shadow-xl rounded-xl md:rounded-2xl animate-drift delay-1000 transition-colors duration-300 ${isDark ? 'bg-slate-900 border-slate-800 text-indigo-400' : 'bg-white border-slate-50 text-indigo-400'}`}>
-                                <Binary className="w-4 md:w-6 h-4 md:h-6" />
-                            </div>
+                            {/* Decorative icons */}
+                            <div className={`absolute top-4 md:top-10 left-4 md:left-10 p-4 md:p-6 border shadow-xl rounded-xl md:rounded-2xl animate-drift transition-colors duration-300 ${isDark ? 'bg-slate-900 border-slate-800 text-slate-500' : 'bg-white border-slate-50 text-slate-400'}`}><Code className="w-4 md:w-6 h-4 md:h-6" /></div>
+                            <div className={`absolute bottom-4 md:bottom-10 right-4 md:right-10 p-4 md:p-6 border shadow-xl rounded-xl md:rounded-2xl animate-drift delay-1000 transition-colors duration-300 ${isDark ? 'bg-slate-900 border-slate-800 text-indigo-400' : 'bg-white border-slate-50 text-indigo-400'}`}><Binary className="w-4 md:w-6 h-4 md:h-6" /></div>
                             <div className={`absolute inset-0 border rounded-full scale-110 md:scale-125 opacity-20 transition-colors ${isDark ? 'border-slate-700' : 'border-slate-100'}`}></div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Projects */}
+            {/* Projects Section */}
             <section id="projects" className={`py-24 md:py-40 px-6 md:px-8 border-y transition-colors duration-300 ${isDark ? 'bg-slate-950 border-slate-800/60' : 'bg-white border-slate-200/60'}`}>
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 md:mb-32 gap-8">
@@ -293,7 +263,7 @@ const App = () => {
                 </div>
             </section>
 
-            {/* Contact */}
+            {/* Contact Section */}
             <section id="contact" className={`py-24 md:py-48 px-6 md:px-8 transition-colors duration-300 ${isDark ? 'bg-slate-900' : 'bg-[#f8fafc]'}`}>
                 <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-32">
                     <div className="flex-1 text-center lg:text-left w-full">
@@ -315,23 +285,25 @@ const App = () => {
                     <div className={`w-full max-w-lg p-8 md:p-14 rounded-[2.5rem] md:rounded-[4rem] border shadow-2xl relative overflow-hidden transition-colors duration-300 ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200/60'}`}>
                         {formState === 'success' ? (
                             <div className="py-6 md:py-10 text-center animate-in fade-in zoom-in duration-500">
-                                <div className="w-20 h-20 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-8">
-                                    <AlertCircle className="w-10 h-10" />
+                                <div className="w-20 h-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
+                                    <CheckCircle2 className="w-10 h-10" />
                                 </div>
-                                <h3 className={`text-2xl md:text-3xl font-black mb-4 tracking-tight leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>请手动完成下一步</h3>
+                                <h3 className={`text-2xl md:text-3xl font-black mb-4 tracking-tight leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>消息已送达</h3>
                                 <p className="text-slate-400 font-medium mb-10 leading-relaxed text-sm md:text-lg">
-                                    系统无法直接发送。请点击下方按钮，使用您的邮件客户端发送。
+                                    邮件已通过 ECS 服务器成功推送到我的终端。我会尽快回复。
                                 </p>
-                                <div className="flex flex-col gap-4">
-                                    <button onClick={openMailClient} className="w-full py-4 md:py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl md:rounded-2xl transition-all shadow-xl flex items-center justify-center space-x-3">
-                                        <Mail className="w-5 h-5" />
-                                        <span>唤起邮件客户端</span>
-                                    </button>
-                                    <button onClick={resetForm} className="w-full py-4 text-slate-400 hover:text-slate-600 font-bold transition-all text-sm">返回修改</button>
-                                </div>
+                                <button onClick={() => setFormState('idle')} className="w-full py-4 text-slate-400 hover:text-slate-600 font-bold transition-all text-sm">
+                                    发送另一条
+                                </button>
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10">
+                                {formState === 'error' && (
+                                    <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-bold flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" /> 服务器连接失败，请稍后重试
+                                    </div>
+                                )}
+
                                 {['Name', 'Email'].map((field) => (
                                     <div className="relative" key={field}>
                                         <label className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 absolute -top-5 left-2">{field}</label>
@@ -341,8 +313,9 @@ const App = () => {
                                             onChange={handleInputChange}
                                             type={field === 'Email' ? 'email' : 'text'}
                                             required
+                                            disabled={formState === 'loading'}
                                             placeholder={field === 'Name' ? "您的称呼" : "您的邮箱"}
-                                            className={`w-full border-none rounded-xl md:rounded-2xl px-6 md:px-8 py-4 md:py-5 focus:ring-4 focus:ring-indigo-500/20 transition-all outline-none text-sm md:text-base ${isDark ? 'bg-slate-900 text-white placeholder:text-slate-600' : 'bg-slate-50 text-slate-900 placeholder:text-slate-400'}`}
+                                            className={`w-full border-none rounded-xl md:rounded-2xl px-6 md:px-8 py-4 md:py-5 focus:ring-4 focus:ring-indigo-500/20 transition-all outline-none text-sm md:text-base ${isDark ? 'bg-slate-900 text-white placeholder:text-slate-600' : 'bg-slate-50 text-slate-900 placeholder:text-slate-400'} disabled:opacity-50`}
                                         />
                                     </div>
                                 ))}
@@ -353,13 +326,14 @@ const App = () => {
                                         value={formData.message}
                                         onChange={handleInputChange}
                                         required
+                                        disabled={formState === 'loading'}
                                         placeholder="想对我说的话..."
                                         rows="3"
-                                        className={`w-full border-none rounded-xl md:rounded-2xl px-6 md:px-8 py-4 md:py-5 focus:ring-4 focus:ring-indigo-500/20 transition-all resize-none outline-none text-sm md:text-base ${isDark ? 'bg-slate-900 text-white placeholder:text-slate-600' : 'bg-slate-50 text-slate-900 placeholder:text-slate-400'}`}
+                                        className={`w-full border-none rounded-xl md:rounded-2xl px-6 md:px-8 py-4 md:py-5 focus:ring-4 focus:ring-indigo-500/20 transition-all resize-none outline-none text-sm md:text-base ${isDark ? 'bg-slate-900 text-white placeholder:text-slate-600' : 'bg-slate-50 text-slate-900 placeholder:text-slate-400'} disabled:opacity-50`}
                                     ></textarea>
                                 </div>
                                 <button disabled={formState === 'loading'} type="submit" className={`w-full font-black py-5 md:py-7 rounded-2xl md:rounded-3xl transition-all shadow-xl flex items-center justify-center space-x-3 active:scale-95 disabled:opacity-70 ${isDark ? 'bg-white text-slate-950 hover:bg-indigo-400 hover:text-white' : 'bg-slate-900 hover:bg-indigo-600 text-white'}`}>
-                                    {formState === 'loading' ? <><span className="text-xs md:text-sm uppercase tracking-widest">准备中</span><Loader2 className="w-5 h-5 animate-spin" /></> : <><span className="text-xs md:text-sm uppercase tracking-widest">发送消息</span><Send className="w-4 h-4" /></>}
+                                    {formState === 'loading' ? <><span className="text-xs md:text-sm uppercase tracking-widest">正在推送</span><Loader2 className="w-5 h-5 animate-spin" /></> : <><span className="text-xs md:text-sm uppercase tracking-widest">即时发送</span><Send className="w-4 h-4" /></>}
                                 </button>
                             </form>
                         )}
@@ -378,44 +352,12 @@ const App = () => {
                 </div>
             </footer>
 
-            {/* Modal */}
-            {selectedProject && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
-                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={() => setSelectedProject(null)}></div>
-                    <div className={`relative w-full max-w-5xl h-full max-h-[90vh] border rounded-[2rem] md:rounded-[4rem] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300 transition-colors ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
-                        <button onClick={() => setSelectedProject(null)} className="absolute top-6 md:top-12 right-6 md:right-12 z-50 text-slate-400 hover:text-indigo-500 transition-all">
-                            <X className="w-8 h-8" />
-                        </button>
-                        <div className="overflow-y-auto p-8 md:p-16">
-                            <div className="mb-4 text-indigo-500 font-black uppercase tracking-[0.3em] md:tracking-[0.5em] text-[8px] md:text-[10px]">{selectedProject.tags.join(" // ")}</div>
-                            <h2 className={`text-4xl md:text-7xl font-black mb-8 md:mb-16 tracking-tighter leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{selectedProject.title}</h2>
-                            <div className="space-y-12 md:space-y-24">
-                                <div className="relative pl-6 md:pl-12 border-l-2 border-indigo-500"><p className="text-xl md:text-3xl text-slate-500 leading-relaxed font-light italic">{selectedProject.details.methodology}</p></div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20">
-                                    <div className={`p-8 md:p-12 rounded-2xl md:rounded-[3rem] border transition-colors ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
-                                        <h4 className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.4em] md:tracking-[0.5em] text-indigo-500/40 mb-8 md:mb-12">Core Highlights</h4>
-                                        <ul className="space-y-6 md:space-y-10">
-                                            {selectedProject.details.features.map((f, i) => (
-                                                <li key={i} className="flex items-start text-base md:text-lg text-slate-500 font-medium"><span className="w-1.5 h-1.5 bg-indigo-500 rounded-full mr-4 md:mr-6 mt-2.5 shrink-0"></span>{f}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                    <div className="flex flex-col justify-between gap-12">
-                                        <div><h4 className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.4em] md:tracking-[0.5em] text-indigo-500/40 mb-6 md:mb-10">Technical Specs</h4><p className="text-slate-500 leading-relaxed text-base md:text-lg font-medium">{selectedProject.details.tech}</p></div>
-                                        <div className="space-y-4">
-                                            {selectedProject.links.map((link, i) => (
-                                                <a key={i} href={link.url} target="_blank" className={`flex items-center justify-between p-6 md:p-8 rounded-2xl md:rounded-3xl font-black transition-all hover:bg-indigo-600 shadow-xl group/link ${isDark ? 'bg-white text-slate-950 hover:text-white' : 'bg-slate-900 text-white'}`}>
-                                                    <span className="uppercase tracking-widest text-[10px] md:text-xs">{link.label}</span><ArrowRight className="w-5 h-5 group-hover/link:translate-x-2 transition-transform" />
-                                                </a>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Modal Component */}
+            <ProjectModal
+                project={selectedProject}
+                onClose={() => setSelectedProject(null)}
+                isDark={isDark}
+            />
         </div>
     );
 };
