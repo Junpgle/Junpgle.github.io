@@ -5,10 +5,10 @@ import {
 } from 'lucide-react';
 
 // 引入拆分的数据和组件
-import { projects } from './projects';
+import { projects } from './data/projects';
 import ProjectModal from './components/ProjectModal';
 
-// ★ 这里修改为你的阿里云 ECS 公网 IP
+// ★ 这里修改为你的阿里云 ECS 公网 IP (开发时如果本地测试可以用 localhost)
 const API_URL = 'http://101.200.13.100:3000/api/contact';
 
 const App = () => {
@@ -18,6 +18,8 @@ const App = () => {
 
     // 表单状态: idle | loading | success | error
     const [formState, setFormState] = useState('idle');
+    // 新增：专门存储具体的错误信息（例如：发送太频繁）
+    const [errorMessage, setErrorMessage] = useState('');
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
     // 主题状态
@@ -71,6 +73,7 @@ const App = () => {
         if (!formData.name || !formData.email || !formData.message) return;
 
         setFormState('loading');
+        setErrorMessage(''); // 重置错误信息
 
         try {
             const response = await fetch(API_URL, {
@@ -87,10 +90,12 @@ const App = () => {
                 // 3秒后重置按钮状态，方便再次发送
                 setTimeout(() => setFormState('idle'), 5000);
             } else {
+                // 这里会捕获后端返回的 "msg" (例如：发送太频繁...)
                 throw new Error(data.msg || '发送失败');
             }
         } catch (error) {
             console.error('API Error:', error);
+            setErrorMessage(error.message); // 设置具体的错误信息
             setFormState('error');
         }
     };
@@ -300,7 +305,9 @@ const App = () => {
                             <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10">
                                 {formState === 'error' && (
                                     <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-bold flex items-center gap-2">
-                                        <AlertCircle className="w-4 h-4" /> 服务器连接失败，请稍后重试
+                                        <AlertCircle className="w-4 h-4" />
+                                        {/* 显示具体的错误信息（如：发送太频繁） */}
+                                        {errorMessage || '服务器连接失败，请稍后重试'}
                                     </div>
                                 )}
 
