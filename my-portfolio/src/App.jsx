@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 
 // 引入拆分的数据和组件
-import { projects } from './data/projects';
+import { projects } from './projects.js';
 import ProjectModal from './components/ProjectModal';
 
 // ★ 这里修改为你的阿里云 ECS 公网 IP (开发时如果本地测试可以用 localhost)
