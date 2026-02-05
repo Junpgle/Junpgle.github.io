@@ -2,7 +2,7 @@ export async function onRequestPost(context) {
     const { request } = context;
 
     // 你的 ECS 服务器地址 (HTTP)
-    const ECS_API_URL = "http://101.200.13.100:3000/api/contact";
+    const ECS_API_URL = "http://101.200.13.100:8080/api/contact";
 
     try {
         // 1. 解析前端发来的数据
