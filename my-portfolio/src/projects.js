@@ -1,9 +1,16 @@
+// 路径修正：因为文件在 src/projects.js，而图片在 src/assets/
+// 所以使用 ./assets (同级目录下的 assets 文件夹)
+import learnwordImg from './assets/learnword.jpg';
+import hfutImg from './assets/cxcy.jpg';
+import musicImg from './assets/4dmusic.jpg';
+import guideImg from './assets/yearreward.jpg';
+
 export const projects = [
     {
         id: "learnword",
         title: "LearnWord — 智能单词记忆工具",
         shortDesc: "基于三阶段记忆闭环（认知→自测→输出）的科学记忆工具，结合算法驱动复习逻辑。",
-        image: "./src/assets/learnword.jpg",
+        image: learnwordImg,
         tags: ["Python", "记忆算法", "桌面应用"],
         category: "desktop",
         links: [{ label: "查看代码", url: "https://github.com/Junpgle/LearnWord" }],
@@ -17,7 +24,7 @@ export const projects = [
         id: "hfut-exam",
         title: "HFUT 创新创业题库系统",
         shortDesc: "服务两百多名用户的在线题库，基于 Cloudflare D1 边缘数据库构建。",
-        image: "./src/assets/cxcy.jpg",
+        image: hfutImg,
         tags: ["边缘计算", "SQL", "Cloudflare"],
         category: "web",
         links: [{ label: "在线体验", url: "https://hfut-innovation-and-entrepreneurship-question-bank.pages.dev/" }],
@@ -31,7 +38,7 @@ export const projects = [
         id: "4dmusic",
         title: "四维声乐 Pro Max — AI 声乐分析",
         shortDesc: "融合 DSP 信号处理与大模型的声乐教学平台。支持实时音准追踪、共鸣腔体分析与 AI 智能点评。",
-        image: "./src/assets/4dmusic.jpg",
+        image: musicImg,
         tags: ["Web", "DSP 算法", "GenAI"],
         category: "web",
         links: [{ label: "立即体验", url: "https://4dmusic.junpgle.me" }],
@@ -49,7 +56,7 @@ export const projects = [
         id: "guide-2025",
         title: "GUIDE 2025 — 年度报告生成器",
         shortDesc: "纯浏览器端驱动的静态年度回顾网页生成器。支持视差滚动与烟花交互，数据 100% 隐私安全。",
-        image: "./src/assets/yearreward.jpg",
+        image: guideImg,
         tags: ["Web", "隐私保护", "动态交互"],
         category: "web",
         links: [{ label: "立即创作", url: "https://github.com/Junpgle/2025-Summary" }],
