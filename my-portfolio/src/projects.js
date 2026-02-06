@@ -4,6 +4,8 @@ import learnwordImg from './assets/learnword.jpg';
 import hfutImg from './assets/cxcy.jpg';
 import musicImg from './assets/4dmusic.jpg';
 import guideImg from './assets/yearreward.jpg';
+import starTrailImg from './assets/starttrail.jpg';
+import mathQuizImg from '../assets/mathquiz.jpg';
 
 export const projects = [
     {
@@ -65,5 +67,41 @@ export const projects = [
             features: ["绝对隐私：所有照片、文字仅存在浏览器或导出为 JSON。", "定制时间轴：智能压缩图片，平衡加载速度与画质。", "视效增强：纯静态实现烟花粒子系统与视差滚动。"],
             tech: "HTML5 File API + Canvas + LocalStorage。极致的端侧数据持久化方案。"
         }
-    }
+    },
+    {
+        id: "startrail-pro",
+        title: "StarTrail Pro — 星轨工坊",
+        shortDesc: "专为星空摄影师设计的高性能后期工具，支持彗星模式星轨合成与 Google Motion Photo 实况照片生成。",
+        image: starTrailImg,
+        tags: ["C++", "Qt", "OpenCV", "图像处理"],
+        category: "desktop",
+        links: [{ label: "获取软件", url: "https://github.com/Junpgle/StarTrails/releases" }],
+        details: {
+            methodology: "基于 Google MicroVideo V1 标准实现 MotionPhotoMuxer，通过解析 JPEG 结构并注入 XMP 元数据，将生成的 MP4 数据无损追加到图片中。针对 DNG/Raw 格式实现了自定义读取器，自动进行 16-bit 到 8-bit 的位深映射。",
+            features: [
+                "彗星模式星轨：支持滑动窗口算法，生成类似流星雨的动态拖尾效果，可自定义拖尾长度。",
+                "实况照片生成：独家算法生成 Motion Photo (JPG)，完美兼容 Google Photos 和安卓相册，长按即可播放形成过程。",
+                "极速渲染引擎：利用 OpenCL GPU 加速大规模像素运算，支持异步多线程处理 8K 级高分辨率序列。"
+            ],
+            tech: "C++17, Qt 6.5+, OpenCV 4.x, OpenCL, Google MicroVideo Protocol"
+        }
+    },
+    {
+        id: "math-quiz",
+        title: "Math Quiz System — 小学生数学测验系统",
+        shortDesc: "基于 Qt 开发的桌面端数学练习平台，集成用户管理、智能随机出题与多维成绩排行功能。",
+        image: mathQuizImg,
+        tags: ["C++", "Qt", "教育软件", "桌面应用"],
+        category: "desktop",
+        links: [{ label: "查看源码", url: "https://github.com/Junpgle/Quiz-for-elementary-school-students-QT/releases" }],
+        details: {
+            methodology: "采用经典的面向对象架构设计，利用 Qt 信号槽机制实现流畅的界面交互。系统内置轻量级文件数据库引擎，实现了用户数据与题库的持久化存储与解析。",
+            features: [
+                "全功能考试系统：支持新用户注册登录，内置随机算法自动生成算术题目，并支持手动增删改查题库。",
+                "智能排行榜：实现了自定义排序算法，基于“分数优先、时间次之”的规则自动生成 TOP10 高手榜。",
+                "数据回溯：自动记录每次测验的详细答卷（包含题目、用户答案、正确答案及判定结果），方便随时查阅历史记录。"
+            ],
+            tech: "C++17, Qt 6 (Widgets), QFile/QTextStream, Custom Sorting Algorithms"
+        }
+    },
 ];
