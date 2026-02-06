@@ -5,7 +5,7 @@ import hfutImg from './assets/cxcy.jpg';
 import musicImg from './assets/4dmusic.jpg';
 import guideImg from './assets/yearreward.jpg';
 import starTrailImg from './assets/starttrail.jpg';
-import mathQuizImg from '../assets/mathquiz.jpg';
+import mathQuizImg from './assets/mathquiz.jpg';
 
 export const projects = [
     {
