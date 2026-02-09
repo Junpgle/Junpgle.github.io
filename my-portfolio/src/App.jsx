@@ -193,7 +193,7 @@ const App = () => {
                             </p>
                         </div>
                         <div className={`flex p-1 rounded-xl md:rounded-2xl border overflow-x-auto whitespace-nowrap scrollbar-hide transition-colors ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                            {['all', 'desktop', 'web'].map((tab) => (
+                            {['all', 'desktop', 'web','fullstack'].map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
