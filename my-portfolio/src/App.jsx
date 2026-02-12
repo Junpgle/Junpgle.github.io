@@ -396,10 +396,10 @@ const App = () => {
 
                     {/* 1. overflow-hidden: 隐藏超出部分
             2. transition-all duration-1000 ease-in-out: 极度平滑的高度动画
-            3. max-h 控制: 折叠时固定高度 (如 800px)，展开时给一个足够大的值 (如 5000px)
+            3. max-h 控制: 折叠时固定高度 (如 800px)，
         */}
                     <div className={`relative overflow-hidden transition-all duration-1000 ease-in-out ${
-                        isDiaryExpanded ? 'max-h-[5000px]' : 'max-h-[600px] md:max-h-[800px]'
+                        isDiaryExpanded ? 'max-h-[3000000px]' : 'max-h-[600px] md:max-h-[800px]'
                     }`}>
 
                         {/* Masonry 容器：渲染所有数据 */}
