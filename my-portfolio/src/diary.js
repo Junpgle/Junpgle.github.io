@@ -267,5 +267,14 @@ export const diaryData = [
             { id: "m30-2", type: "text", content: "啥玩意" },
             { id: "m30-3", type: "text", content: "你要写日记?" }
         ]
+    },
+    {
+        id: 31,
+        date: "2026.02.12",
+        nickname: "小成",
+        avatar: "小",
+        messages: [
+            { id: "m30-1", type: "text", content: "我替你记得" }
+        ]
     }
 ];
