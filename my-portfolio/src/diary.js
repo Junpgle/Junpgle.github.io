@@ -257,5 +257,15 @@ export const diaryData = [
             { id: "m29-4", type: "text", content: "https://doc.itlym.cn/log.html" },
             { id: "m29-5", type: "text", content: "如下" },
         ]
+    },{
+        id: 30,
+        date: "2026.02.12",
+        nickname: "巴拿马牛河",
+        avatar: "巴",
+        messages: [
+            { id: "m30-1", type: "text", content: "?" },
+            { id: "m30-2", type: "text", content: "啥玩意" },
+            { id: "m30-3", type: "text", content: "你要写日记?" }
+        ]
     }
 ];
