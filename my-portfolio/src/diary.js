@@ -66,8 +66,8 @@ export const diaryData = [
         nickname: "开心果",
         avatar: "开",
         messages: [
-            { id: "m8-1", type: "image", content: "/public/m8-1.jpg" },
-            { id: "m8-1", type: "text", content: "你在做收藏合集吗" }
+            { id: "m8-1", type: "image", content: "/m8-1.jpg" },
+            { id: "m8-2", type: "text", content: "你在做收藏合集吗" }
         ]
     },
     {
@@ -96,8 +96,8 @@ export const diaryData = [
         avatar: "D",
         messages: [
             { id: "m11-1", type: "text", content: "写自己的名字班级座号" },
-            { id: "m11-2", type: "image", content: "/public/m11-2.jpg" },
-            { id: "m11-3", type: "image", content: "/public/m11-3.jpg" }
+            { id: "m11-2", type: "image", content: "/m11-2.jpg" },
+            { id: "m11-3", type: "image", content: "/m11-3.jpg" }
         ]
     },{
         id: 12,
@@ -106,16 +106,7 @@ export const diaryData = [
         avatar: "吱",
         messages: [
             { id: "m12-1", type: "text", content: "班级姓名座位号" },
-            { id: "m12-2", type: "text", content: "1. 人类名称\n" +
-                    "2. 配料表\n" +
-                    "3. 净含量/规格\n" +
-                    "4. 生产者\n" +
-                    "5. 生产日期\n" +
-                    "6. 保质期\n" +
-                    "7. 贮存条件\n" +
-                    "8. 人类生产许可证编号\n" +
-                    "9. 人类标准代号\n" +
-                    "10. 营养成分表" }
+            { id: "m12-2", type: "text", content: "1. 人类名称\n2. 配料表\n3. 净含量/规格\n4. 生产者\n5. 生产日期\n6. 保质期\n7. 贮存条件\n8. 人类生产许可证编号\n9. 人类标准代号\n10. 营养成分表" }
         ]
     },{
         id: 13,
@@ -155,7 +146,7 @@ export const diaryData = [
         nickname: "清觳",
         avatar: "清",
         messages: [
-            { id: "m17-1", type: "image", content: "/public/m17-1.png" }
+            { id: "m17-1", type: "image", content: "/m17-1.png" }
         ]
     },{
         id: 18,
@@ -163,18 +154,9 @@ export const diaryData = [
         nickname: "silhouettes",
         avatar: "s",
         messages: [
-            { id: "m18-1", type: "image", content: "/public/m18-1.png" }
+            { id: "m18-1", type: "image", content: "/m18-1.png" }
         ]
     },
-    // {
-    //     id: 19,
-    //     date: "2026.02.12",
-    //     nickname: "SQT",
-    //     avatar: "S",
-    //     messages: [
-    //         { id: "m19-1", type: "text", content: "什么梗" }
-    //     ]
-    // },
     {
         id: 20,
         date: "2026.02.12",
@@ -190,7 +172,7 @@ export const diaryData = [
         avatar: "。",
         messages: [
             { id: "m21-1", type: "text", content: "空一页写名字" },
-            { id: "m21-2", type: "image", content: "/public/m21-2.png" }
+            { id: "m21-2", type: "image", content: "/m21-2.png" }
         ]
     },{
         id: 22,
@@ -198,10 +180,8 @@ export const diaryData = [
         nickname: "。",
         avatar: "。",
         messages: [
-            { id: "m22-1", type: "text", content: "现在是x年x月x日的x时x分\n" +
-                    "这里是日记本第一页\n" +
-                    "黄劲东到此一游" },
-            { id: "m22-2", type: "image", content: "/public/m22-2.jpg" }
+            { id: "m22-1", type: "text", content: "现在是x年x月x日的x时x分\n这里是日记本第一页\n黄劲东到此一游" },
+            { id: "m22-2", type: "image", content: "/m22-2.jpg" }
         ]
     },{
         id: 23,
@@ -210,7 +190,7 @@ export const diaryData = [
         avatar: "p",
         messages: [
             { id: "m23-1", type: "text", content: "写名字" },
-            { id: "m23-2", type: "image", content: "/public/m23-2.jpg" }
+            { id: "m23-2", type: "image", content: "/m23-2.jpg" }
         ]
     },{
         id: 24,
@@ -231,7 +211,7 @@ export const diaryData = [
         nickname: "轻&羽.",
         avatar: "轻",
         messages: [
-            { id: "m25-1", type: "image", content: "/public/m25-2.jpg" },
+            { id: "m25-1", type: "image", content: "/m25-2.jpg" },
             { id: "m25-2", type: "text", content: "你遗忘的，我替你记得" }
 
         ]
