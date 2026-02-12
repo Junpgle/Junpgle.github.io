@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useMemo } from 'react';
 import {
     Github, ArrowRight, Database, BrainCircuit, Binary, Terminal, Bot,
     Mail, Send, Loader2, Code, Zap, Music, Moon, Sun, Monitor, AlertCircle,
@@ -22,6 +22,17 @@ const App = () => {
 
     const [theme, setTheme] = useState('system');
     const [isDark, setIsDark] = useState(false);
+
+    // 每次组件挂载时，随机打乱日记数据
+    // 使用 useMemo 保证即使切换暗色模式等触发重新渲染时，日记的随机顺序也不会在一半发生改变，避免跳变
+    const shuffledDiary = useMemo(() => {
+        const shuffled = [...diaryData];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }, []);
 
     useEffect(() => {
         setIsLoaded(true);
@@ -265,13 +276,13 @@ const App = () => {
 
             {/* Diary Section - 日记本的第一页 */}
             <section id="diary" className={`py-24 md:py-40 px-6 md:px-8 border-b transition-colors duration-300 ${isDark ? 'bg-slate-950 border-slate-800/60' : 'bg-[#fcfbf9] border-slate-200/60'}`}>
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="flex flex-col items-center mb-20 text-center">
+                    <div className="flex flex-col items-center mb-24 md:mb-32 text-center">
                         <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 transition-colors ${isDark ? 'bg-slate-900 text-indigo-400' : 'bg-white text-indigo-500 shadow-sm border border-slate-100'}`}>
                             <BookHeart className="w-8 h-8" />
                         </div>
-                        <h2 className="font-diary text-4xl md:text-5xl mb-4 transition-colors text-indigo-500 dark:text-indigo-400">
+                        <h2 className="font-diary text-4xl md:text-6xl mb-4 transition-colors text-indigo-500 dark:text-indigo-400">
                             日记本的第一页
                         </h2>
                         <p className={`text-[10px] uppercase tracking-[0.3em] font-bold ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
@@ -279,74 +290,78 @@ const App = () => {
                         </p>
                     </div>
 
-                    {/* Chat Flow */}
-                    <div className="space-y-12">
-                        {diaryData.map((entry) => (
-                            <div key={entry.id} className={`flex w-full ${entry.side === 'right' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`flex max-w-[90%] md:max-w-[75%] gap-3 md:gap-4 ${entry.side === 'right' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    {/* Wall of Thoughts - Masonry Layout (按人进行区块划分) */}
+                    <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 sm:gap-8 max-w-7xl mx-auto w-full px-2 sm:px-0">
+                        {shuffledDiary.map((entry, index) => {
+                            // 预设的微小倾斜角度，营造随意感
+                            const rotClass = ['-rotate-3', 'rotate-2', '-rotate-1', 'rotate-3', '-rotate-2', 'rotate-1'][index % 6];
+                            // 独立的浮动动画周期与延迟
+                            const floatDur = 6 + (index % 4);
+                            const floatDel = (index % 5) * 0.4;
+                            // 手机端的交错排布对齐
+                            const alignClass = ['mr-auto ml-1', 'ml-auto mr-1', 'mx-auto', 'ml-4 mr-auto', 'ml-auto mr-4'][index % 5];
 
-                                    {/* Avatar */}
-                                    <div className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-black text-sm md:text-base border shadow-sm ${
-                                        isDark
-                                            ? 'bg-slate-800 border-slate-700 text-indigo-400'
-                                            : 'bg-white border-slate-100 text-indigo-600'
+                            return (
+                                <div
+                                    key={entry.id}
+                                    className={`break-inside-avoid relative mb-12 w-[95%] sm:w-full ${alignClass} sm:mx-0 z-0 hover:z-10`}
+                                    style={{ animation: `float ${floatDur}s ease-in-out infinite ${floatDel}s` }}
+                                >
+                                    {/* 整个人的便签容器 */}
+                                    <div className={`relative p-6 sm:p-8 rounded-[2rem] shadow-sm hover:shadow-2xl transform transition-all duration-500 backdrop-blur-md border group ${rotClass} hover:rotate-0 hover:scale-[1.02] ${
+                                        isDark ? 'bg-slate-900/60 border-slate-700/50 hover:bg-slate-800/80' : 'bg-white/80 border-slate-200/60 hover:bg-white'
                                     }`}>
-                                        {entry.avatar}
-                                    </div>
 
-                                    {/* Messages Group */}
-                                    <div className={`flex flex-col gap-2 md:gap-3 ${entry.side === 'right' ? 'items-end' : 'items-start'}`}>
+                                        {/* 顶部胶带装饰 (提升日记本贴纸质感) */}
+                                        <div className={`absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 backdrop-blur-md border shadow-sm rotate-[-4deg] z-10 ${
+                                            isDark ? 'bg-indigo-500/10 border-white/10' : 'bg-indigo-50/50 border-black/5'
+                                        }`}></div>
 
-                                        {/* Name & Date */}
-                                        <div className={`flex items-baseline gap-2 mb-1 ${entry.side === 'right' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                            <span className={`text-xs md:text-sm font-bold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{entry.nickname}</span>
-                                            <span className="text-[10px] text-slate-400 uppercase tracking-widest">{entry.date}</span>
+                                        {/* Card Header (头像、昵称、日期) */}
+                                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-dashed border-slate-300 dark:border-slate-700 opacity-80">
+                                            <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-black text-sm border-2 shadow-sm ${
+                                                isDark ? 'bg-slate-800 border-slate-600 text-indigo-400' : 'bg-slate-100 border-white text-indigo-500'
+                                            }`}>
+                                                {entry.avatar}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className={`text-sm font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{entry.nickname}</span>
+                                                <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-500">{entry.date}</span>
+                                            </div>
                                         </div>
 
-                                        {/* Iterating through multiple messages in one group */}
-                                        {entry.messages.map((msg, index) => {
-                                            const isFirst = index === 0;
-
-                                            if (msg.type === 'text') {
-                                                return (
-                                                    <div key={msg.id} className={`font-diary text-lg md:text-2xl leading-loose px-5 py-3 md:px-6 md:py-4 rounded-3xl border shadow-sm relative w-fit ${
-                                                        entry.side === 'right'
-                                                            ? (isDark ? 'bg-indigo-900/20 border-indigo-900/50 text-indigo-100' : 'bg-indigo-50 border-indigo-100 text-indigo-900')
-                                                            : (isDark ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-700')
-                                                    } ${
-                                                        isFirst
-                                                            ? (entry.side === 'right' ? 'rounded-tr-sm' : 'rounded-tl-sm')
-                                                            : ''
+                                        {/* 该人的多条消息列表 */}
+                                        <div className="flex flex-col gap-4">
+                                            {entry.messages.map((msg) => (
+                                                msg.type === 'text' ? (
+                                                    // 每条文字消息对应一个独立的小气泡框
+                                                    <div key={msg.id} className={`p-4 md:p-5 rounded-2xl relative shadow-sm ${
+                                                        isDark ? 'bg-slate-800/50 border border-slate-700' : 'bg-slate-50/80 border border-slate-100'
                                                     }`}>
-                                                        {msg.content}
+                                                        {/* 使用 whitespace-pre-wrap 确保 \n 能正常换行 */}
+                                                        <div className={`font-diary text-xl sm:text-2xl leading-relaxed whitespace-pre-wrap ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                                                            {msg.content}
+                                                        </div>
                                                     </div>
-                                                );
-                                            }
-
-                                            if (msg.type === 'image') {
-                                                return (
-                                                    <div key={msg.id} className="relative w-fit">
-                                                        <img
-                                                            src={msg.content}
-                                                            alt="diary attachment"
-                                                            className={`rounded-2xl md:rounded-3xl border shadow-sm max-w-[220px] sm:max-w-[300px] object-cover ${
-                                                                isDark ? 'border-slate-800' : 'border-slate-200'
-                                                            }`}
-                                                        />
+                                                ) : (
+                                                    // 图片消息的框框
+                                                    <div key={msg.id} className={`relative rounded-xl overflow-hidden shadow-sm border p-1 ${
+                                                        isDark ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-100'
+                                                    }`}>
+                                                        <img src={msg.content} alt="diary" className="w-full h-auto object-cover rounded-lg transform transition-transform duration-700 hover:scale-105" />
                                                     </div>
-                                                );
-                                            }
-                                            return null;
-                                        })}
+                                                )
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     {/* End Marker */}
-                    <div className="flex justify-center mt-20">
-                        <div className={`h-1 w-20 rounded-full ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}></div>
+                    <div className="flex justify-center mt-32">
+                        <div className={`h-1.5 w-16 md:w-24 rounded-full ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}></div>
                     </div>
                 </div>
             </section>
