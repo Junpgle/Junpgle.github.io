@@ -1,32 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import {
     Github, ArrowRight, Database, BrainCircuit, Binary, Terminal, Bot,
-    Mail, Send, Loader2, Code, Zap, Music, Moon, Sun, Monitor, AlertCircle, CheckCircle2
+    Mail, Send, Loader2, Code, Zap, Music, Moon, Sun, Monitor, AlertCircle,
+    CheckCircle2, BookHeart, X, ExternalLink
 } from 'lucide-react';
-
 // 引入拆分的数据和组件
 import { projects } from './projects.js';
 import ProjectModal from './components/ProjectModal';
+import { diaryData } from './diary.js';
 
-// ★ 这里修改为你的阿里云 ECS 公网 IP (开发时如果本地测试可以用 localhost)
-const API_URL = '/api/contact';
+const API_URL = '/api/contact'; // ★ 修改为你的 ECS 接口
 
 const App = () => {
     const [activeTab, setActiveTab] = useState('all');
     const [selectedProject, setSelectedProject] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    // 表单状态: idle | loading | success | error
     const [formState, setFormState] = useState('idle');
-    // 新增：专门存储具体的错误信息（例如：发送太频繁）
     const [errorMessage, setErrorMessage] = useState('');
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
-    // 主题状态
     const [theme, setTheme] = useState('system');
     const [isDark, setIsDark] = useState(false);
 
-    // 初始化
     useEffect(() => {
         setIsLoaded(true);
         const savedTheme = localStorage.getItem('theme') || 'system';
@@ -34,7 +30,7 @@ const App = () => {
         applyTheme(savedTheme);
 
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleChange = (e) => {
+        const handleChange = () => {
             if (savedTheme === 'system') applyTheme('system');
         };
         mediaQuery.addEventListener('change', handleChange);
@@ -67,13 +63,12 @@ const App = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // --- 核心：连接后端 ECS ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.name || !formData.email || !formData.message) return;
 
         setFormState('loading');
-        setErrorMessage(''); // 重置错误信息
+        setErrorMessage('');
 
         try {
             const response = await fetch(API_URL, {
@@ -81,21 +76,17 @@ const App = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
-
             const data = await response.json();
-
             if (response.ok && data.success) {
                 setFormState('success');
-                setFormData({ name: '', email: '', message: '' }); // 清空
-                // 3秒后重置按钮状态，方便再次发送
+                setFormData({ name: '', email: '', message: '' });
                 setTimeout(() => setFormState('idle'), 5000);
             } else {
-                // 这里会捕获后端返回的 "msg" (例如：发送太频繁...)
                 throw new Error(data.msg || '发送失败');
             }
         } catch (error) {
             console.error('API Error:', error);
-            setErrorMessage(error.message); // 设置具体的错误信息
+            setErrorMessage(error.message || '连接失败');
             setFormState('error');
         }
     };
@@ -107,6 +98,8 @@ const App = () => {
     return (
         <div className={`min-h-screen font-sans antialiased transition-colors duration-300 selection:bg-indigo-500/30 selection:text-indigo-600 dark:selection:text-indigo-400 overflow-x-hidden ${isDark ? 'bg-slate-950 text-slate-200' : 'bg-[#f8fafc] text-slate-700'}`}>
             <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
+                
                 @keyframes reveal { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
                 @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
                 @keyframes drift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(10px, 10px); } }
@@ -115,6 +108,8 @@ const App = () => {
                 .animate-drift { animation: drift 8s ease-in-out infinite; }
                 .scrollbar-hide::-webkit-scrollbar { display: none; }
                 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+                
+                .font-diary { font-family: 'Ma Shan Zheng', cursive; }
             `}</style>
 
             {/* Navigation */}
@@ -130,6 +125,7 @@ const App = () => {
                     <div className="flex items-center space-x-4 md:space-x-12">
                         <div className="hidden sm:flex items-center space-x-6 md:space-x-12 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em]">
                             <a href="#projects" className={`transition-colors hover:text-indigo-500 ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>Works</a>
+                            <a href="#diary" className={`transition-colors hover:text-indigo-500 ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>Diary</a>
                             <a href="#contact" className={`transition-colors hover:text-indigo-500 ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>Contact</a>
                             <a href="https://github.com/Junpgle" target="_blank" rel="noopener noreferrer" className={`transition-colors hover:text-indigo-500 ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>
                                 <Github className="w-4 h-4" />
@@ -172,7 +168,6 @@ const App = () => {
                             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 md:h-48 h-32 md:w-48 border shadow-2xl rounded-[2rem] md:rounded-[3rem] flex items-center justify-center animate-float transition-colors duration-300 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
                                 <BrainCircuit className={`w-12 md:w-20 h-12 md:h-20 opacity-80 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`} />
                             </div>
-                            {/* Decorative icons */}
                             <div className={`absolute top-4 md:top-10 left-4 md:left-10 p-4 md:p-6 border shadow-xl rounded-xl md:rounded-2xl animate-drift transition-colors duration-300 ${isDark ? 'bg-slate-900 border-slate-800 text-slate-500' : 'bg-white border-slate-50 text-slate-400'}`}><Code className="w-4 md:w-6 h-4 md:h-6" /></div>
                             <div className={`absolute bottom-4 md:bottom-10 right-4 md:right-10 p-4 md:p-6 border shadow-xl rounded-xl md:rounded-2xl animate-drift delay-1000 transition-colors duration-300 ${isDark ? 'bg-slate-900 border-slate-800 text-indigo-400' : 'bg-white border-slate-50 text-indigo-400'}`}><Binary className="w-4 md:w-6 h-4 md:h-6" /></div>
                             <div className={`absolute inset-0 border rounded-full scale-110 md:scale-125 opacity-20 transition-colors ${isDark ? 'border-slate-700' : 'border-slate-100'}`}></div>
@@ -268,6 +263,94 @@ const App = () => {
                 </div>
             </section>
 
+            {/* Diary Section - 日记本的第一页 */}
+            <section id="diary" className={`py-24 md:py-40 px-6 md:px-8 border-b transition-colors duration-300 ${isDark ? 'bg-slate-950 border-slate-800/60' : 'bg-[#fcfbf9] border-slate-200/60'}`}>
+                <div className="max-w-4xl mx-auto">
+                    {/* Header */}
+                    <div className="flex flex-col items-center mb-20 text-center">
+                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 transition-colors ${isDark ? 'bg-slate-900 text-indigo-400' : 'bg-white text-indigo-500 shadow-sm border border-slate-100'}`}>
+                            <BookHeart className="w-8 h-8" />
+                        </div>
+                        <h2 className="font-diary text-4xl md:text-5xl mb-4 transition-colors text-indigo-500 dark:text-indigo-400">
+                            日记本的第一页
+                        </h2>
+                        <p className={`text-[10px] uppercase tracking-[0.3em] font-bold ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                            The First Page of Diary
+                        </p>
+                    </div>
+
+                    {/* Chat Flow */}
+                    <div className="space-y-12">
+                        {diaryData.map((entry) => (
+                            <div key={entry.id} className={`flex w-full ${entry.side === 'right' ? 'justify-end' : 'justify-start'}`}>
+                                <div className={`flex max-w-[90%] md:max-w-[75%] gap-3 md:gap-4 ${entry.side === 'right' ? 'flex-row-reverse' : 'flex-row'}`}>
+
+                                    {/* Avatar */}
+                                    <div className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-black text-sm md:text-base border shadow-sm ${
+                                        isDark
+                                            ? 'bg-slate-800 border-slate-700 text-indigo-400'
+                                            : 'bg-white border-slate-100 text-indigo-600'
+                                    }`}>
+                                        {entry.avatar}
+                                    </div>
+
+                                    {/* Messages Group */}
+                                    <div className={`flex flex-col gap-2 md:gap-3 ${entry.side === 'right' ? 'items-end' : 'items-start'}`}>
+
+                                        {/* Name & Date */}
+                                        <div className={`flex items-baseline gap-2 mb-1 ${entry.side === 'right' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                            <span className={`text-xs md:text-sm font-bold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{entry.nickname}</span>
+                                            <span className="text-[10px] text-slate-400 uppercase tracking-widest">{entry.date}</span>
+                                        </div>
+
+                                        {/* Iterating through multiple messages in one group */}
+                                        {entry.messages.map((msg, index) => {
+                                            const isFirst = index === 0;
+
+                                            if (msg.type === 'text') {
+                                                return (
+                                                    <div key={msg.id} className={`font-diary text-lg md:text-2xl leading-loose px-5 py-3 md:px-6 md:py-4 rounded-3xl border shadow-sm relative w-fit ${
+                                                        entry.side === 'right'
+                                                            ? (isDark ? 'bg-indigo-900/20 border-indigo-900/50 text-indigo-100' : 'bg-indigo-50 border-indigo-100 text-indigo-900')
+                                                            : (isDark ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-700')
+                                                    } ${
+                                                        isFirst
+                                                            ? (entry.side === 'right' ? 'rounded-tr-sm' : 'rounded-tl-sm')
+                                                            : ''
+                                                    }`}>
+                                                        {msg.content}
+                                                    </div>
+                                                );
+                                            }
+
+                                            if (msg.type === 'image') {
+                                                return (
+                                                    <div key={msg.id} className="relative w-fit">
+                                                        <img
+                                                            src={msg.content}
+                                                            alt="diary attachment"
+                                                            className={`rounded-2xl md:rounded-3xl border shadow-sm max-w-[220px] sm:max-w-[300px] object-cover ${
+                                                                isDark ? 'border-slate-800' : 'border-slate-200'
+                                                            }`}
+                                                        />
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* End Marker */}
+                    <div className="flex justify-center mt-20">
+                        <div className={`h-1 w-20 rounded-full ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}></div>
+                    </div>
+                </div>
+            </section>
+
             {/* Contact Section */}
             <section id="contact" className={`py-24 md:py-48 px-6 md:px-8 transition-colors duration-300 ${isDark ? 'bg-slate-900' : 'bg-[#f8fafc]'}`}>
                 <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-32">
@@ -306,7 +389,6 @@ const App = () => {
                                 {formState === 'error' && (
                                     <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-bold flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4" />
-                                        {/* 显示具体的错误信息（如：发送太频繁） */}
                                         {errorMessage || '服务器连接失败，请稍后重试'}
                                     </div>
                                 )}
@@ -353,7 +435,7 @@ const App = () => {
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-center text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-slate-400">
                     <div>© 2026 Designed by Junpgle.</div>
                     <div className="flex space-x-10 md:space-x-16">
-                        <a href="https://github.com/Junpgle" target="_blank" className={`transition-all hover:text-indigo-500 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>GitHub</a>
+                        <a href="https://github.com/Junpgle" target="_blank" rel="noopener noreferrer" className={`transition-all hover:text-indigo-500 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>GitHub</a>
                         <a href="#projects" className={`transition-all hover:text-indigo-500 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>Archive</a>
                     </div>
                 </div>

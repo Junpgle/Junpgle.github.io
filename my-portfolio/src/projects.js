@@ -1,5 +1,3 @@
-// 路径修正：因为文件在 src/projects.js，而图片在 src/assets/
-// 所以使用 ./assets (同级目录下的 assets 文件夹)
 import learnwordImg from './assets/learnword.jpg';
 import hfutImg from './assets/cxcy.jpg';
 import musicImg from './assets/4dmusic.jpg';
