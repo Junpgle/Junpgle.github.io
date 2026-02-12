@@ -274,6 +274,86 @@ const App = () => {
                 </div>
             </section>
 
+            {/* Contact Section */}
+            <section id="contact" className={`py-24 md:py-48 px-6 md:px-8 transition-colors duration-300 ${isDark ? 'bg-slate-900' : 'bg-[#f8fafc]'}`}>
+                <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-32">
+                    <div className="flex-1 text-center lg:text-left w-full">
+                        <h2 className={`text-6xl md:text-8xl font-black tracking-tighter mb-8 md:mb-12 transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}>联系我.</h2>
+                        <p className="text-xl md:text-2xl text-slate-400 font-medium leading-relaxed max-w-md mb-12 md:mb-16 mx-auto lg:mx-0">
+                            无论是智能算法交流，还是工程项目合作，欢迎通过邮件联系。
+                        </p>
+                        <a href="mailto:junpgle@qq.com" className="inline-flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 group">
+                            <div className={`w-16 md:w-20 h-16 md:h-20 rounded-2xl md:rounded-[2rem] border flex items-center justify-center transition-all duration-500 shadow-xl group-hover:bg-indigo-600 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
+                                <Mail className={`w-6 md:w-8 h-6 md:h-8 transition-colors group-hover:text-white ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`} />
+                            </div>
+                            <div className="text-center sm:text-left">
+                                <div className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Email Archive</div>
+                                <div className={`text-xl md:text-2xl font-black transition-colors break-all group-hover:text-indigo-500 ${isDark ? 'text-white' : 'text-slate-900'}`}>junpgle@qq.com</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div className={`w-full max-w-lg p-8 md:p-14 rounded-[2.5rem] md:rounded-[4rem] border shadow-2xl relative overflow-hidden transition-colors duration-300 ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200/60'}`}>
+                        {formState === 'success' ? (
+                            <div className="py-6 md:py-10 text-center animate-in fade-in zoom-in duration-500">
+                                <div className="w-20 h-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
+                                    <CheckCircle2 className="w-10 h-10" />
+                                </div>
+                                <h3 className={`text-2xl md:text-3xl font-black mb-4 tracking-tight leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>消息已送达</h3>
+                                <p className="text-slate-400 font-medium mb-10 leading-relaxed text-sm md:text-lg">
+                                    邮件已通过 ECS 服务器成功推送到我的终端。我会尽快回复。
+                                </p>
+                                <button onClick={() => setFormState('idle')} className="w-full py-4 text-slate-400 hover:text-slate-600 font-bold transition-all text-sm">
+                                    发送另一条
+                                </button>
+                            </div>
+                        ) : (
+                            <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10">
+                                {formState === 'error' && (
+                                    <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-bold flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" />
+                                        {errorMessage || '服务器连接失败，请稍后重试'}
+                                    </div>
+                                )}
+
+                                {['Name', 'Email'].map((field) => (
+                                    <div className="relative" key={field}>
+                                        <label className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 absolute -top-5 left-2">{field}</label>
+                                        <input
+                                            name={field.toLowerCase()}
+                                            value={formData[field.toLowerCase()]}
+                                            onChange={handleInputChange}
+                                            type={field === 'Email' ? 'email' : 'text'}
+                                            required
+                                            disabled={formState === 'loading'}
+                                            placeholder={field === 'Name' ? "您的称呼" : "您的邮箱"}
+                                            className={`w-full border-none rounded-xl md:rounded-2xl px-6 md:px-8 py-4 md:py-5 focus:ring-4 focus:ring-indigo-500/20 transition-all outline-none text-sm md:text-base ${isDark ? 'bg-slate-900 text-white placeholder:text-slate-600' : 'bg-slate-50 text-slate-900 placeholder:text-slate-400'} disabled:opacity-50`}
+                                        />
+                                    </div>
+                                ))}
+                                <div className="relative">
+                                    <label className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 absolute -top-5 left-2">Message</label>
+                                    <textarea
+                                        name="message"
+                                        value={formData.message}
+                                        onChange={handleInputChange}
+                                        required
+                                        disabled={formState === 'loading'}
+                                        placeholder="想对我说的话..."
+                                        rows="3"
+                                        className={`w-full border-none rounded-xl md:rounded-2xl px-6 md:px-8 py-4 md:py-5 focus:ring-4 focus:ring-indigo-500/20 transition-all resize-none outline-none text-sm md:text-base ${isDark ? 'bg-slate-900 text-white placeholder:text-slate-600' : 'bg-slate-50 text-slate-900 placeholder:text-slate-400'} disabled:opacity-50`}
+                                    ></textarea>
+                                </div>
+                                <button disabled={formState === 'loading'} type="submit" className={`w-full font-black py-5 md:py-7 rounded-2xl md:rounded-3xl transition-all shadow-xl flex items-center justify-center space-x-3 active:scale-95 disabled:opacity-70 ${isDark ? 'bg-white text-slate-950 hover:bg-indigo-400 hover:text-white' : 'bg-slate-900 hover:bg-indigo-600 text-white'}`}>
+                                    {formState === 'loading' ? <><span className="text-xs md:text-sm uppercase tracking-widest">正在推送</span><Loader2 className="w-5 h-5 animate-spin" /></> : <><span className="text-xs md:text-sm uppercase tracking-widest">即时发送</span><Send className="w-4 h-4" /></>}
+                                </button>
+                            </form>
+                        )}
+                    </div>
+                </div>
+            </section>
+
+
             {/* Diary Section - 日记本的第一页 */}
             <section id="diary" className={`py-24 md:py-40 px-6 md:px-8 border-b transition-colors duration-300 ${isDark ? 'bg-slate-950 border-slate-800/60' : 'bg-[#fcfbf9] border-slate-200/60'}`}>
                 <div className="max-w-7xl mx-auto">
@@ -366,84 +446,6 @@ const App = () => {
                 </div>
             </section>
 
-            {/* Contact Section */}
-            <section id="contact" className={`py-24 md:py-48 px-6 md:px-8 transition-colors duration-300 ${isDark ? 'bg-slate-900' : 'bg-[#f8fafc]'}`}>
-                <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-32">
-                    <div className="flex-1 text-center lg:text-left w-full">
-                        <h2 className={`text-6xl md:text-8xl font-black tracking-tighter mb-8 md:mb-12 transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}>联系我.</h2>
-                        <p className="text-xl md:text-2xl text-slate-400 font-medium leading-relaxed max-w-md mb-12 md:mb-16 mx-auto lg:mx-0">
-                            无论是智能算法交流，还是工程项目合作，欢迎通过邮件联系。
-                        </p>
-                        <a href="mailto:junpgle@qq.com" className="inline-flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 group">
-                            <div className={`w-16 md:w-20 h-16 md:h-20 rounded-2xl md:rounded-[2rem] border flex items-center justify-center transition-all duration-500 shadow-xl group-hover:bg-indigo-600 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
-                                <Mail className={`w-6 md:w-8 h-6 md:h-8 transition-colors group-hover:text-white ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`} />
-                            </div>
-                            <div className="text-center sm:text-left">
-                                <div className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Email Archive</div>
-                                <div className={`text-xl md:text-2xl font-black transition-colors break-all group-hover:text-indigo-500 ${isDark ? 'text-white' : 'text-slate-900'}`}>junpgle@qq.com</div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div className={`w-full max-w-lg p-8 md:p-14 rounded-[2.5rem] md:rounded-[4rem] border shadow-2xl relative overflow-hidden transition-colors duration-300 ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200/60'}`}>
-                        {formState === 'success' ? (
-                            <div className="py-6 md:py-10 text-center animate-in fade-in zoom-in duration-500">
-                                <div className="w-20 h-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
-                                    <CheckCircle2 className="w-10 h-10" />
-                                </div>
-                                <h3 className={`text-2xl md:text-3xl font-black mb-4 tracking-tight leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>消息已送达</h3>
-                                <p className="text-slate-400 font-medium mb-10 leading-relaxed text-sm md:text-lg">
-                                    邮件已通过 ECS 服务器成功推送到我的终端。我会尽快回复。
-                                </p>
-                                <button onClick={() => setFormState('idle')} className="w-full py-4 text-slate-400 hover:text-slate-600 font-bold transition-all text-sm">
-                                    发送另一条
-                                </button>
-                            </div>
-                        ) : (
-                            <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10">
-                                {formState === 'error' && (
-                                    <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-bold flex items-center gap-2">
-                                        <AlertCircle className="w-4 h-4" />
-                                        {errorMessage || '服务器连接失败，请稍后重试'}
-                                    </div>
-                                )}
-
-                                {['Name', 'Email'].map((field) => (
-                                    <div className="relative" key={field}>
-                                        <label className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 absolute -top-5 left-2">{field}</label>
-                                        <input
-                                            name={field.toLowerCase()}
-                                            value={formData[field.toLowerCase()]}
-                                            onChange={handleInputChange}
-                                            type={field === 'Email' ? 'email' : 'text'}
-                                            required
-                                            disabled={formState === 'loading'}
-                                            placeholder={field === 'Name' ? "您的称呼" : "您的邮箱"}
-                                            className={`w-full border-none rounded-xl md:rounded-2xl px-6 md:px-8 py-4 md:py-5 focus:ring-4 focus:ring-indigo-500/20 transition-all outline-none text-sm md:text-base ${isDark ? 'bg-slate-900 text-white placeholder:text-slate-600' : 'bg-slate-50 text-slate-900 placeholder:text-slate-400'} disabled:opacity-50`}
-                                        />
-                                    </div>
-                                ))}
-                                <div className="relative">
-                                    <label className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 absolute -top-5 left-2">Message</label>
-                                    <textarea
-                                        name="message"
-                                        value={formData.message}
-                                        onChange={handleInputChange}
-                                        required
-                                        disabled={formState === 'loading'}
-                                        placeholder="想对我说的话..."
-                                        rows="3"
-                                        className={`w-full border-none rounded-xl md:rounded-2xl px-6 md:px-8 py-4 md:py-5 focus:ring-4 focus:ring-indigo-500/20 transition-all resize-none outline-none text-sm md:text-base ${isDark ? 'bg-slate-900 text-white placeholder:text-slate-600' : 'bg-slate-50 text-slate-900 placeholder:text-slate-400'} disabled:opacity-50`}
-                                    ></textarea>
-                                </div>
-                                <button disabled={formState === 'loading'} type="submit" className={`w-full font-black py-5 md:py-7 rounded-2xl md:rounded-3xl transition-all shadow-xl flex items-center justify-center space-x-3 active:scale-95 disabled:opacity-70 ${isDark ? 'bg-white text-slate-950 hover:bg-indigo-400 hover:text-white' : 'bg-slate-900 hover:bg-indigo-600 text-white'}`}>
-                                    {formState === 'loading' ? <><span className="text-xs md:text-sm uppercase tracking-widest">正在推送</span><Loader2 className="w-5 h-5 animate-spin" /></> : <><span className="text-xs md:text-sm uppercase tracking-widest">即时发送</span><Send className="w-4 h-4" /></>}
-                                </button>
-                            </form>
-                        )}
-                    </div>
-                </div>
-            </section>
 
             {/* Footer */}
             <footer className={`py-16 md:py-24 px-6 md:px-8 border-t transition-colors duration-300 ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200/60'}`}>
