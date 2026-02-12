@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+html {
+    /* 1. 开启平滑滚动 */
+    scroll-behavior: smooth;
+
+    /* 2. 解决顶部导航栏遮挡问题 */
+    /* 你的导航栏在移动端是 h-16 (64px)，桌面端是 h-20 (80px) */
+    /* 设置一个略大于导航栏高度的值，比如 100px，这样跳转后标题会有一些呼吸空间 */
+    scroll-padding-top: 100px;
+}

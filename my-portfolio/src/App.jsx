@@ -34,6 +34,9 @@ const App = () => {
         return shuffled;
     }, []);
 
+    // 控制日记展开的状态
+    const [isDiaryExpanded, setIsDiaryExpanded] = useState(false);
+
     useEffect(() => {
         setIsLoaded(true);
         const savedTheme = localStorage.getItem('theme') || 'system';
@@ -354,11 +357,12 @@ const App = () => {
             </section>
 
 
-            {/* Diary Section - 日记本的第一页 */}
+            {/* Diary Section */}
             <section id="diary" className={`py-24 md:py-40 px-6 md:px-8 border-b transition-colors duration-300 ${isDark ? 'bg-slate-950 border-slate-800/60' : 'bg-[#fcfbf9] border-slate-200/60'}`}>
-                <div className="max-w-7xl mx-auto">
-                    {/* Header */}
-                    <div className="flex flex-col items-center mb-24 md:mb-32 text-center">
+                <div className="max-w-[1600px] mx-auto">
+
+                    {/* Header 保持不变 */}
+                    <div className="flex flex-col items-center mb-16 md:mb-24 text-center">
                         <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 transition-colors ${isDark ? 'bg-slate-900 text-indigo-400' : 'bg-white text-indigo-500 shadow-sm border border-slate-100'}`}>
                             <BookHeart className="w-8 h-8" />
                         </div>
@@ -368,81 +372,123 @@ const App = () => {
                         <p className={`text-[10px] uppercase tracking-[0.3em] font-bold ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                             The First Page of Diary
                         </p>
+
+                        {/* 新增：留言跳转链接 */}
+                        <a
+                            href="https://docs.qq.com/form/page/DRkFVQUdJSGVqWVFs"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`mt-8 group flex items-center gap-2 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all hover:-translate-y-1 hover:shadow-lg ${
+                                isDark
+                                    ? 'bg-slate-900 border-slate-700 text-slate-300 hover:bg-indigo-950 hover:text-indigo-400 hover:border-indigo-900'
+                                    : 'bg-white border-slate-200 text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 shadow-sm'
+                            }`}
+                        >
+                            <span>✨ 点我留言 / Leave a Message</span>
+                            <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />
+                        </a>
+
                     </div>
 
-                    {/* Wall of Thoughts - Masonry Layout (按人进行区块划分) */}
-                    <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 sm:gap-8 max-w-7xl mx-auto w-full px-2 sm:px-0">
-                        {shuffledDiary.map((entry, index) => {
-                            // 预设的微小倾斜角度，营造随意感
-                            const rotClass = ['-rotate-3', 'rotate-2', '-rotate-1', 'rotate-3', '-rotate-2', 'rotate-1'][index % 6];
-                            // 独立的浮动动画周期与延迟
-                            const floatDur = 6 + (index % 4);
-                            const floatDel = (index % 5) * 0.4;
-                            // 手机端的交错排布对齐
-                            const alignClass = ['mr-auto ml-1', 'ml-auto mr-1', 'mx-auto', 'ml-4 mr-auto', 'ml-auto mr-4'][index % 5];
 
-                            return (
-                                <div
-                                    key={entry.id}
-                                    className={`break-inside-avoid relative mb-12 w-[95%] sm:w-full ${alignClass} sm:mx-0 z-0 hover:z-10`}
-                                    style={{ animation: `float ${floatDur}s ease-in-out infinite ${floatDel}s` }}
-                                >
-                                    {/* 整个人的便签容器 */}
-                                    <div className={`relative p-6 sm:p-8 rounded-[2rem] shadow-sm hover:shadow-2xl transform transition-all duration-500 backdrop-blur-md border group ${rotClass} hover:rotate-0 hover:scale-[1.02] ${
-                                        isDark ? 'bg-slate-900/60 border-slate-700/50 hover:bg-slate-800/80' : 'bg-white/80 border-slate-200/60 hover:bg-white'
-                                    }`}>
 
-                                        {/* 顶部胶带装饰 (提升日记本贴纸质感) */}
-                                        <div className={`absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 backdrop-blur-md border shadow-sm rotate-[-4deg] z-10 ${
-                                            isDark ? 'bg-indigo-500/10 border-white/10' : 'bg-indigo-50/50 border-black/5'
-                                        }`}></div>
+                    {/* --- 核心修改区域开始 --- */}
 
-                                        {/* Card Header (头像、昵称、日期) */}
-                                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-dashed border-slate-300 dark:border-slate-700 opacity-80">
-                                            <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-black text-sm border-2 shadow-sm ${
-                                                isDark ? 'bg-slate-800 border-slate-600 text-indigo-400' : 'bg-slate-100 border-white text-indigo-500'
-                                            }`}>
-                                                {entry.avatar}
+                    {/* 1. overflow-hidden: 隐藏超出部分
+            2. transition-all duration-1000 ease-in-out: 极度平滑的高度动画
+            3. max-h 控制: 折叠时固定高度 (如 800px)，展开时给一个足够大的值 (如 5000px)
+        */}
+                    <div className={`relative overflow-hidden transition-all duration-1000 ease-in-out ${
+                        isDiaryExpanded ? 'max-h-[5000px]' : 'max-h-[600px] md:max-h-[800px]'
+                    }`}>
+
+                        {/* Masonry 容器：渲染所有数据 */}
+                        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-6 sm:gap-8 w-full px-2 sm:px-0 space-y-12 pb-12">
+                            {shuffledDiary.map((entry, index) => {
+                                const rotClass = ['-rotate-3', 'rotate-2', '-rotate-1', 'rotate-3', '-rotate-2', 'rotate-1'][index % 6];
+                                const floatDur = 6 + (index % 4);
+                                const floatDel = (index % 5) * 0.4;
+
+                                return (
+                                    <div
+                                        key={entry.id}
+                                        className={`break-inside-avoid relative mb-12 w-full z-0 hover:z-10`}
+                                        style={{ animation: `float ${floatDur}s ease-in-out infinite ${floatDel}s` }}
+                                    >
+                                        <div className={`relative p-6 sm:p-8 rounded-[2rem] shadow-sm hover:shadow-2xl transform transition-all duration-500 backdrop-blur-md border group ${rotClass} hover:rotate-0 hover:scale-[1.02] ${
+                                            isDark ? 'bg-slate-900/60 border-slate-700/50 hover:bg-slate-800/80' : 'bg-white/80 border-slate-200/60 hover:bg-white'
+                                        }`}>
+                                            {/* 胶带装饰 */}
+                                            <div className={`absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 backdrop-blur-md border shadow-sm rotate-[-4deg] z-10 ${
+                                                isDark ? 'bg-indigo-500/10 border-white/10' : 'bg-indigo-50/50 border-black/5'
+                                            }`}></div>
+
+                                            {/* 用户信息 */}
+                                            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-dashed border-slate-300 dark:border-slate-700 opacity-80">
+                                                <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-black text-sm border-2 shadow-sm ${
+                                                    isDark ? 'bg-slate-800 border-slate-600 text-indigo-400' : 'bg-slate-100 border-white text-indigo-500'
+                                                }`}>
+                                                    {entry.avatar}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className={`text-sm font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{entry.nickname}</span>
+                                                    <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-500">{entry.date}</span>
+                                                </div>
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className={`text-sm font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{entry.nickname}</span>
-                                                <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-500">{entry.date}</span>
-                                            </div>
-                                        </div>
 
-                                        {/* 该人的多条消息列表 */}
-                                        <div className="flex flex-col gap-4">
-                                            {entry.messages.map((msg) => (
-                                                msg.type === 'text' ? (
-                                                    // 每条文字消息对应一个独立的小气泡框
-                                                    <div key={msg.id} className={`p-4 md:p-5 rounded-2xl relative shadow-sm ${
-                                                        isDark ? 'bg-slate-800/50 border border-slate-700' : 'bg-slate-50/80 border border-slate-100'
-                                                    }`}>
-                                                        {/* 使用 whitespace-pre-wrap 确保 \n 能正常换行 */}
-                                                        <div className={`font-diary text-xl sm:text-2xl leading-relaxed whitespace-pre-wrap ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                                                            {msg.content}
+                                            {/* 消息内容 */}
+                                            <div className="flex flex-col gap-4">
+                                                {entry.messages.map((msg) => (
+                                                    msg.type === 'text' ? (
+                                                        <div key={msg.id} className={`p-4 md:p-5 rounded-2xl relative shadow-sm ${
+                                                            isDark ? 'bg-slate-800/50 border border-slate-700' : 'bg-slate-50/80 border border-slate-100'
+                                                        }`}>
+                                                            <div className={`font-diary text-xl sm:text-2xl leading-relaxed whitespace-pre-wrap ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                                                                {msg.content}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ) : (
-                                                    // 图片消息的框框
-                                                    <div key={msg.id} className={`relative rounded-xl overflow-hidden shadow-sm border p-1 ${
-                                                        isDark ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-100'
-                                                    }`}>
-                                                        <img src={msg.content} alt="diary" className="w-full h-auto object-cover rounded-lg transform transition-transform duration-700 hover:scale-105" />
-                                                    </div>
-                                                )
-                                            ))}
+                                                    ) : (
+                                                        <div key={msg.id} className={`relative rounded-xl overflow-hidden shadow-sm border p-1 ${
+                                                            isDark ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-100'
+                                                        }`}>
+                                                            <img src={msg.content} alt="diary" className="w-full h-auto object-cover rounded-lg transform transition-transform duration-700 hover:scale-105" />
+                                                        </div>
+                                                    )
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
+
+                        {/* 渐变遮罩层 (Gradient Mask)
+                绝对定位在底部，高度较大(h-64)，确保遮挡自然。
+                pointer-events-none 保证点击穿透（虽然盖在上面，但如果展开了就不需要挡鼠标了）
+                opacity 控制：展开时透明度变为 0，配合 transition 实现淡出
+            */}
+                        <div className={`absolute bottom-0 left-0 w-full h-48 md:h-80 pointer-events-none transition-opacity duration-1000 z-10 bg-gradient-to-t ${
+                            isDark
+                                ? 'from-slate-950 via-slate-950/90 to-transparent'
+                                : 'from-[#fcfbf9] via-[#fcfbf9]/90 to-transparent'
+                        } ${isDiaryExpanded ? 'opacity-0' : 'opacity-100'}`}></div>
                     </div>
 
-                    {/* End Marker */}
-                    <div className="flex justify-center mt-32">
-                        <div className={`h-1.5 w-16 md:w-24 rounded-full ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}></div>
+                    {/* 控制按钮 */}
+                    <div className="flex justify-center mt-8 md:mt-12 relative z-20">
+                        <button
+                            onClick={() => setIsDiaryExpanded(!isDiaryExpanded)}
+                            className={`group relative px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-[0.2em] border transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-3 ${
+                                isDark
+                                    ? 'bg-slate-900 border-slate-700 text-slate-300 hover:bg-indigo-950 hover:text-indigo-400 hover:border-indigo-900'
+                                    : 'bg-white border-slate-200 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 shadow-sm'
+                            }`}
+                        >
+                            <span>{isDiaryExpanded ? 'Collapse Archive' : 'Read Full Diary'}</span>
+                            <ArrowRight className={`w-4 h-4 transition-transform duration-500 ${isDiaryExpanded ? '-rotate-90' : 'rotate-90'}`} />
+                        </button>
                     </div>
+
                 </div>
             </section>
 
