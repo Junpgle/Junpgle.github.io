@@ -1,10 +1,10 @@
-import learnwordImg from './assets/learnword.jpg';
-import hfutImg from './assets/cxcy.jpg';
-import musicImg from './assets/4dmusic.jpg';
-import guideImg from './assets/yearreward.jpg';
-import starTrailImg from './assets/starttrail.jpg';
-import mathQuizImg from './assets/mathquiz.jpg';
-import mathQuizLiteImg from './assets/mathquizlite.jpg';
+import learnwordImg from '../assets/learnword.jpg';
+import hfutImg from '../assets/cxcy.jpg';
+import musicImg from '../assets/4dmusic.jpg';
+import guideImg from '../assets/yearreward.jpg';
+import starTrailImg from '../assets/starttrail.jpg';
+import mathQuizImg from '../assets/mathquiz.jpg';
+import mathQuizLiteImg from '../assets/mathquizlite.jpg';
 
 export const projects = [
     {
