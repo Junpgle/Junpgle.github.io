@@ -276,5 +276,14 @@ export const diaryData = [
         messages: [
             { id: "m30-1", type: "text", content: "我替你记得" }
         ]
+    },
+    {
+        id: 32,
+        date: "2026.02.12",
+        nickname: "撞日死.",
+        avatar: "撞",
+        messages: [
+            { id: "m32-1", type: "text", content: "'什么'" }
+        ]
     }
 ];

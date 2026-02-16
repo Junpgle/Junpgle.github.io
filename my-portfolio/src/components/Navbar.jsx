@@ -12,13 +12,18 @@ const Navbar = ({ isDark, colorMode, toggleColorMode, theme }) => {
                 return <Snowflake className="w-4 h-4" />;
             case 'autumn':
                 return <Leaf className="w-4 h-4" />;
-            default: // default & spring
+            default:
                 return <Terminal className="w-4 h-4" />;
         }
     };
 
     return (
-        <nav className={`fixed top-0 w-full z-50 border-b backdrop-blur-md transition-colors duration-500 ${theme.colors.border} ${isDark ? 'bg-slate-950/80' : 'bg-white/80'}`}>
+        // ★★★ 核心修复在这里 ★★★
+        // 1. 移除了 isDark ? 'bg-slate-...' : 'bg-white...'
+        // 2. 换成了 ${theme.colors.bg}，这样春节主题就会保持深红，不会变白
+        // 3. 加了 bg-opacity-90 保持一点点磨砂透视感
+        <nav className={`fixed top-0 w-full z-50 border-b backdrop-blur-md transition-colors duration-500 ${theme.colors.border} ${theme.colors.bg} bg-opacity-90`}>
+
             <div className="max-w-7xl mx-auto px-6 md:px-8 h-16 md:h-20 flex items-center justify-between">
 
                 {/* 1. Logo Area */}

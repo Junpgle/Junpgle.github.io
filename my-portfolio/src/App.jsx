@@ -84,17 +84,25 @@ const App = () => {
         }
     };
 
-    return (
-        // ★ 关键：最外层 div 必须包含 theme.colors.bg 和 text
-        // Tailwind 的 dark: 类名是作用在这些 utility class 上的
-        <div className={`min-h-screen font-sans antialiased transition-colors duration-500 overflow-x-hidden ${theme.colors.bg} ${theme.colors.text} ${theme.colors.selection}`}>
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
-                .font-diary { font-family: 'Ma Shan Zheng', cursive; }
-                .scrollbar-hide::-webkit-scrollbar { display: none; }
-            `}</style>
+    // src/App.jsx 仅修改 return 部分的开头
 
-            {renderDecoration()}
+    return (
+        // 添加 relative 和 z-0，确保内容在装饰层之上
+        <div className={`relative min-h-screen font-sans antialiased transition-colors duration-500 overflow-x-hidden ${theme.colors.text} ${theme.colors.selection}`}>
+
+            {/* 背景色层：直接由 theme.colors.bg 控制，放在最底层 */}
+            <div className={`absolute inset-0 z-[-2] transition-colors duration-500 ${theme.colors.bg}`}></div>
+
+            <style>{`
+            @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
+            .font-diary { font-family: 'Ma Shan Zheng', cursive; }
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+        `}</style>
+
+            {/* 装饰层：z-[-1] */}
+            <div className="absolute inset-0 z-[-1]">
+                {renderDecoration()}
+            </div>
 
             <Navbar
                 isDark={isDark}
