@@ -60,8 +60,9 @@ const Hero = ({ isLoaded, isDark, theme }) => {
                             {/* 内部发光 */}
                             <div className={`absolute inset-0 rounded-[2rem] md:rounded-[3rem] opacity-20 ${theme.colors.primaryBg} blur-md`}></div>
 
+                            {/* ★★★ 修改生肖图标 ★★★ */}
                             <div className="text-7xl md:text-9xl opacity-90 select-none relative z-10 drop-shadow-2xl filter">
-                                {theme.id === 'newYear' ? '🐍' : theme.id === 'winter' ? '❄️' : theme.id === 'autumn' ? '🍁' : '⚡'}
+                                {theme.id === 'newYear' ? '🐎' : theme.id === 'winter' ? '❄️' : theme.id === 'autumn' ? '🍁' : '🖥️'}
                             </div>
                         </div>
 

@@ -23,56 +23,77 @@ export const themeVariants = {
         heroText: { badge: "IST Sophomore", title1: "HI,", title2: "I'M", highlight: "JUNPGLE", subtitle: "Code · Intelligence · Innovation" }
     },
 
-    // === 🧧 春节主题 (永久夜间/深红金字版) ===
+    // === 🧧 春节主题 (丙午马年版) ===
     newYear: {
         id: 'newYear',
         name: 'Lunar New Year',
         colors: {
-            // ★ 背景：无论日夜，全是深褐红
+            // 背景：深褐红 (火马年用深红非常合适)
             bg: "bg-[#2a0a0a] dark:bg-[#2a0a0a]",
-
-            // ★ 文字：无论日夜，全是米白/流光金
             text: "text-[#fffbeb] dark:text-[#fffbeb]",
-
-            // ★ 高亮：流光金
             primary: "text-[#fbbf24] dark:text-[#fbbf24]",
-
-            // 选中态
             selection: "selection:bg-red-900 selection:text-amber-200 dark:selection:bg-red-900 dark:selection:text-amber-200",
-
-            // 边框
             border: "border-red-900/30 dark:border-red-900/30",
-
-            // 强背景块
             primaryBg: "bg-[#d97706] dark:bg-[#d97706]",
             primaryBgHover: "hover:bg-amber-500 dark:hover:bg-amber-500",
-
-            // 次要文字
             secondary: "text-amber-100/60 dark:text-amber-100/60",
-
-            // 标签背景
             accentBg: "bg-red-950/50 dark:bg-red-950/50",
             accentBorder: "border-amber-900/50 dark:border-amber-900/50",
-
-            // 按钮：金底黑字 (最显眼)
             button: "bg-amber-500 hover:bg-amber-400 text-red-950 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-red-950",
-
-            // 图标底色
             iconBg: "bg-red-900/40 dark:bg-red-900/40",
-
-            // 遮罩
             gradient: "from-[#2a0a0a] dark:from-[#2a0a0a]"
         },
         heroText: {
-            badge: "🧧 2026 乙巳大吉",
-            title1: "福启",
-            title2: "新岁",
+            // ★ 修改：2026 丙午马年
+            badge: "🧧 2026 丙午马年",
+            title1: "龙马", // 也可以改成 "策马", "飞腾" 等，或者保持 "福启"
+            title2: "精神", // 配合 title1 变成 "龙马精神"
             highlight: "万事兴",
-            subtitle: "Joy · Prosperity · Peace"
+            subtitle: "Passion · Speed · Success"
         }
     },
 
-    // ... Autumn 和 Winter 保持不变 ...
+    // ... Cyber Light, Cyber Dark, Autumn, Winter 保持不变 ...
+    cyberLight: {
+        id: 'cyberLight',
+        name: 'Cyber Light',
+        colors: {
+            bg: "bg-[#f8fafc]",
+            text: "text-slate-700",
+            selection: "selection:bg-indigo-500/30 selection:text-indigo-600",
+            border: "border-slate-200",
+            primary: "text-indigo-600",
+            primaryBg: "bg-indigo-600",
+            primaryBgHover: "hover:bg-indigo-700",
+            secondary: "text-slate-500",
+            accentBg: "bg-indigo-50",
+            accentBorder: "border-indigo-100",
+            button: "bg-slate-900 hover:bg-indigo-600 text-white",
+            iconBg: "bg-white",
+            gradient: "from-[#f8fafc]"
+        },
+        heroText: { badge: "IST Sophomore", title1: "HI,", title2: "I'M", highlight: "JUNPGLE", subtitle: "Code · Intelligence · Innovation" }
+    },
+    cyberDark: {
+        id: 'cyberDark',
+        name: 'Cyber Dark',
+        colors: {
+            bg: "bg-[#020617]",
+            text: "text-slate-300",
+            selection: "selection:bg-indigo-500/30 selection:text-indigo-400",
+            border: "border-slate-800",
+            primary: "text-indigo-400",
+            primaryBg: "bg-indigo-500",
+            primaryBgHover: "hover:bg-indigo-400",
+            secondary: "text-slate-500",
+            accentBg: "bg-indigo-950/30",
+            accentBorder: "border-indigo-500/20",
+            button: "bg-white hover:bg-indigo-400 text-slate-950",
+            iconBg: "bg-slate-900",
+            gradient: "from-[#020617]"
+        },
+        heroText: { badge: "IST Sophomore", title1: "HI,", title2: "I'M", highlight: "JUNPGLE", subtitle: "Code · Intelligence · Innovation" }
+    },
     autumn: {
         id: 'autumn',
         name: 'Golden Autumn',

@@ -1,33 +1,25 @@
 import React from 'react';
-import { Terminal, Sun, Moon, Monitor, Snowflake, Leaf } from 'lucide-react';
+import { Terminal, Snowflake, Leaf, Sparkles } from 'lucide-react';
 
-const Navbar = ({ isDark, colorMode, toggleColorMode, theme }) => {
+const Navbar = ({ isDark, cycleTheme, theme }) => {
 
     // 渲染左上角 Logo 图标
     const renderLogoIcon = () => {
         switch (theme.id) {
-            case 'newYear':
-                return <span className="font-diary font-bold text-lg">春</span>;
-            case 'winter':
-                return <Snowflake className="w-4 h-4" />;
-            case 'autumn':
-                return <Leaf className="w-4 h-4" />;
-            default:
-                return <Terminal className="w-4 h-4" />;
+            case 'newYear': return <span className="font-diary font-bold text-lg">春</span>;
+            case 'winter': return <Snowflake className="w-4 h-4" />;
+            case 'autumn': return <Leaf className="w-4 h-4" />;
+            default: return <Terminal className="w-4 h-4" />;
         }
     };
 
     return (
-        // ★★★ 核心修复在这里 ★★★
-        // 1. 移除了 isDark ? 'bg-slate-...' : 'bg-white...'
-        // 2. 换成了 ${theme.colors.bg}，这样春节主题就会保持深红，不会变白
-        // 3. 加了 bg-opacity-90 保持一点点磨砂透视感
         <nav className={`fixed top-0 w-full z-50 border-b backdrop-blur-md transition-colors duration-500 ${theme.colors.border} ${theme.colors.bg} bg-opacity-90`}>
 
             <div className="max-w-7xl mx-auto px-6 md:px-8 h-16 md:h-20 flex items-center justify-between">
 
-                {/* 1. Logo Area */}
-                <div className="flex items-center space-x-3 group cursor-pointer">
+                {/* 1. Logo 区域 (点击也可以切换主题) */}
+                <div className="flex items-center space-x-3 group cursor-pointer" onClick={cycleTheme}>
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${theme.colors.primaryBg} text-white`}>
                         {renderLogoIcon()}
                     </div>
@@ -36,8 +28,9 @@ const Navbar = ({ isDark, colorMode, toggleColorMode, theme }) => {
                     </span>
                 </div>
 
-                {/* 2. Menu Area */}
+                {/* 2. 菜单区域 */}
                 <div className="flex items-center space-x-4 md:space-x-12">
+                    {/* 链接 (手机端隐藏，PC端显示) */}
                     <div className="hidden sm:flex items-center space-x-6 md:space-x-12 text-[10px] font-black uppercase tracking-[0.3em]">
                         {['Projects', 'Diary', 'Contact'].map(item => (
                             <a
@@ -50,18 +43,18 @@ const Navbar = ({ isDark, colorMode, toggleColorMode, theme }) => {
                         ))}
                     </div>
 
-                    {/* 3. Dark Mode Toggle Button */}
+                    {/* ★★★ 主题切换按钮 (所有端都显示) ★★★ */}
                     <button
                         onClick={(e) => {
                             e.preventDefault();
-                            toggleColorMode();
+                            cycleTheme();
                         }}
-                        className={`p-2 rounded-full transition-all duration-300 hover:scale-110 shadow-sm border ${theme.colors.iconBg} ${theme.colors.border} ${theme.colors.primary}`}
-                        aria-label="Toggle Dark Mode"
+                        className={`relative z-50 p-2 rounded-full transition-all duration-300 hover:scale-110 shadow-sm border group ${theme.colors.iconBg} ${theme.colors.border} ${theme.colors.primary}`}
+                        title="Switch Theme"
+                        aria-label="Switch Theme"
                     >
-                        {colorMode === 'light' && <Sun className="w-4 h-4" />}
-                        {colorMode === 'dark' && <Moon className="w-4 h-4" />}
-                        {colorMode === 'system' && <Monitor className="w-4 h-4" />}
+                        {/* 使用 Sparkles 图标 */}
+                        <Sparkles className="w-4 h-4 transform group-hover:rotate-180 transition-transform" />
                     </button>
                 </div>
             </div>

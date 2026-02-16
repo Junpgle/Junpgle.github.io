@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getTheme } from './theme';
+import { themeVariants } from './theme/variants';
 
-// 导入特效组件 (确保文件名是 .jsx)
 import DefaultDeco from './theme/decorations/DefaultDeco';
 import NewYearDeco from './theme/decorations/NewYearDeco';
 import AutumnDeco from './theme/decorations/AutumnDeco';
@@ -18,100 +17,96 @@ import ProjectModal from './components/ProjectModal';
 import { projects } from './data/projects';
 
 const App = () => {
-    const theme = getTheme();
+    // 主题顺序
+    const themeOrder = ['newYear', 'cyberDark', 'cyberLight', 'autumn', 'winter'];
 
-    // 状态管理
+    // 获取当前主题
+    const [themeKey, setThemeKey] = useState(() => {
+        // 防止 localStorage 里存了旧的 'default' 导致崩溃
+        const saved = localStorage.getItem('themeKey');
+        return (saved && themeVariants[saved]) ? saved : 'newYear';
+    });
+
+    const theme = themeVariants[themeKey] || themeVariants.newYear;
     const [isDark, setIsDark] = useState(false);
-    const [colorMode, setColorMode] = useState('system');
     const [isLoaded, setIsLoaded] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
 
-    // ★★★ 核心修复：确保暗色模式类名正确添加到 html 标签 ★★★
+    // 日夜模式判断逻辑
     useEffect(() => {
         setIsLoaded(true);
-        const savedMode = localStorage.getItem('colorMode') || 'system';
-        setColorMode(savedMode);
-        applyColorMode(savedMode);
 
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleChange = (e) => {
-            if (savedMode === 'system') applyColorMode('system');
+        const applyThemeMode = () => {
+            let shouldBeDark = false;
+            if (themeKey === 'cyberDark') shouldBeDark = true;
+            else if (themeKey === 'cyberLight') shouldBeDark = false;
+            else shouldBeDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            setIsDark(shouldBeDark);
+
+            const root = document.documentElement;
+            if (shouldBeDark) root.classList.add('dark');
+            else root.classList.remove('dark');
         };
 
+        applyThemeMode();
+
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = () => {
+            if (themeKey !== 'cyberDark' && themeKey !== 'cyberLight') applyThemeMode();
+        };
         mediaQuery.addEventListener('change', handleChange);
         return () => mediaQuery.removeEventListener('change', handleChange);
-    }, []);
+    }, [themeKey]);
 
-    const applyColorMode = (mode) => {
-        let shouldBeDark = false;
+    // 切换主题函数
+    const cycleTheme = () => {
+        const currentIndex = themeOrder.indexOf(themeKey);
+        // 如果找不到当前key（比如是旧的default），就重置为0
+        const safeIndex = currentIndex === -1 ? 0 : currentIndex;
+        const nextIndex = (safeIndex + 1) % themeOrder.length;
+        const nextThemeKey = themeOrder[nextIndex];
 
-        if (mode === 'system') {
-            shouldBeDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        } else {
-            shouldBeDark = mode === 'dark';
-        }
-
-        setIsDark(shouldBeDark);
-
-        // ★ 强制操作 DOM 确保 Tailwind 生效
-        const root = window.document.documentElement;
-        if (shouldBeDark) {
-            root.classList.add('dark');
-        } else {
-            root.classList.remove('dark');
-        }
+        setThemeKey(nextThemeKey);
+        localStorage.setItem('themeKey', nextThemeKey);
     };
 
-    const toggleColorMode = () => {
-        let newMode;
-        if (colorMode === 'light') newMode = 'dark';
-        else if (colorMode === 'dark') newMode = 'system';
-        else newMode = 'light';
-
-        setColorMode(newMode);
-        localStorage.setItem('colorMode', newMode);
-        // 关键：切换后立即调用 applyColorMode
-        applyColorMode(newMode);
-    };
-
-    // 渲染特效
     const renderDecoration = () => {
         switch (theme.id) {
             case 'newYear': return <NewYearDeco isDark={isDark} />;
             case 'autumn': return <AutumnDeco isDark={isDark} />;
             case 'winter': return <WinterDeco isDark={isDark} />;
-            default: return <DefaultDeco isDark={isDark} />;
+            case 'cyberLight':
+            case 'cyberDark':
+            default: return <DefaultDeco isDark={isDark} theme={theme} />;
         }
     };
 
-    // src/App.jsx 仅修改 return 部分的开头
-
     return (
-        // 添加 relative 和 z-0，确保内容在装饰层之上
         <div className={`relative min-h-screen font-sans antialiased transition-colors duration-500 overflow-x-hidden ${theme.colors.text} ${theme.colors.selection}`}>
 
-            {/* 背景色层：直接由 theme.colors.bg 控制，放在最底层 */}
-            <div className={`absolute inset-0 z-[-2] transition-colors duration-500 ${theme.colors.bg}`}></div>
+            {/* 背景层 */}
+            <div className={`fixed inset-0 z-[-2] transition-colors duration-500 ${theme.colors.bg}`}></div>
 
             <style>{`
-            @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
-            .font-diary { font-family: 'Ma Shan Zheng', cursive; }
-            .scrollbar-hide::-webkit-scrollbar { display: none; }
-        `}</style>
+                @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
+                .font-diary { font-family: 'Ma Shan Zheng', cursive; }
+                .scrollbar-hide::-webkit-scrollbar { display: none; }
+            `}</style>
 
-            {/* 装饰层：z-[-1] */}
-            <div className="absolute inset-0 z-[-1]">
+            {/* 装饰层 */}
+            <div className="fixed inset-0 z-[-1] pointer-events-none">
                 {renderDecoration()}
             </div>
 
+            {/* 导航栏：务必确认传入了 cycleTheme */}
             <Navbar
                 isDark={isDark}
-                colorMode={colorMode}
-                toggleColorMode={toggleColorMode}
+                cycleTheme={cycleTheme}
                 theme={theme}
             />
 
-            <main>
+            <main className="relative z-10">
                 <Hero isLoaded={isLoaded} isDark={isDark} theme={theme} />
                 <Projects isDark={isDark} projects={projects} setSelectedProject={setSelectedProject} theme={theme} />
                 <TechStack isDark={isDark} theme={theme} />
