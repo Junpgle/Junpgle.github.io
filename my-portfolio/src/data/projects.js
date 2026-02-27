@@ -111,7 +111,7 @@ export const projects = [
         tags: ["C++", "Flutter", "Cloudflare D1", "多端同步"],
         category: "fullstack",
         links: [
-            { label: "查看官网", url: "https://junpgle.github.io/CountdownTodo/" },
+            { label: "查看官网", url: "https://countdowntodo.junpgle.me" },
         ],
         details: {
             methodology: "针对不同终端特性采用差异化技术栈：桌面端使用底层 Win32/GDI+ 打造 KB 级内存占用的常驻挂件；移动端基于 Flutter 构建 Material 3 沉浸式体验。通过统一的 RESTful API 和时间戳冲突解决策略（Last-Write-Wins + 乐观 UI）实现多端数据一致性。",
