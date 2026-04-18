@@ -1,19 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { themeVariants } from './theme/variants';
 
-import DefaultDeco from './theme/decorations/DefaultDeco';
-import NewYearDeco from './theme/decorations/NewYearDeco';
-import AutumnDeco from './theme/decorations/AutumnDeco';
-import WinterDeco from './theme/decorations/WinterDeco';
-
+// 基础组件保持同步加载 (Navbar, Hero)
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import Projects from './components/Projects';
-import TechStack from './components/TechStack';
-import Contact from './components/Contact';
-import Diary from './components/Diary';
 import Footer from './components/Footer';
-import ProjectModal from './components/ProjectModal';
+
+// 懒加载重型组件
+const Projects = lazy(() => import('./components/Projects'));
+const TechStack = lazy(() => import('./components/TechStack'));
+const Contact = lazy(() => import('./components/Contact'));
+const Diary = lazy(() => import('./components/Diary'));
+const ProjectModal = lazy(() => import('./components/ProjectModal'));
+
+// 懒加载主题装饰
+const DefaultDeco = lazy(() => import('./theme/decorations/DefaultDeco'));
+const NewYearDeco = lazy(() => import('./theme/decorations/NewYearDeco'));
+const AutumnDeco = lazy(() => import('./theme/decorations/AutumnDeco'));
+const WinterDeco = lazy(() => import('./theme/decorations/WinterDeco'));
+
 import { projects } from './data/projects';
 
 const App = () => {
@@ -22,7 +27,6 @@ const App = () => {
 
     // 获取当前主题
     const [themeKey, setThemeKey] = useState(() => {
-        // 防止 localStorage 里存了旧的 'default' 导致崩溃
         const saved = localStorage.getItem('themeKey');
         return (saved && themeVariants[saved]) ? saved : 'newYear';
     });
@@ -32,7 +36,6 @@ const App = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
 
-    // 日夜模式判断逻辑
     useEffect(() => {
         setIsLoaded(true);
 
@@ -59,10 +62,8 @@ const App = () => {
         return () => mediaQuery.removeEventListener('change', handleChange);
     }, [themeKey]);
 
-    // 切换主题函数
     const cycleTheme = () => {
         const currentIndex = themeOrder.indexOf(themeKey);
-        // 如果找不到当前key（比如是旧的default），就重置为0
         const safeIndex = currentIndex === -1 ? 0 : currentIndex;
         const nextIndex = (safeIndex + 1) % themeOrder.length;
         const nextThemeKey = themeOrder[nextIndex];
@@ -72,14 +73,20 @@ const App = () => {
     };
 
     const renderDecoration = () => {
-        switch (theme.id) {
-            case 'newYear': return <NewYearDeco isDark={isDark} />;
-            case 'autumn': return <AutumnDeco isDark={isDark} />;
-            case 'winter': return <WinterDeco isDark={isDark} />;
-            case 'cyberLight':
-            case 'cyberDark':
-            default: return <DefaultDeco isDark={isDark} theme={theme} />;
-        }
+        return (
+            <Suspense fallback={null}>
+                {(() => {
+                    switch (theme.id) {
+                        case 'newYear': return <NewYearDeco isDark={isDark} />;
+                        case 'autumn': return <AutumnDeco isDark={isDark} />;
+                        case 'winter': return <WinterDeco isDark={isDark} />;
+                        case 'cyberLight':
+                        case 'cyberDark':
+                        default: return <DefaultDeco isDark={isDark} theme={theme} />;
+                    }
+                })()}
+            </Suspense>
+        );
     };
 
     return (
@@ -89,7 +96,6 @@ const App = () => {
             <div className={`fixed inset-0 z-[-2] transition-colors duration-500 ${theme.colors.bg}`}></div>
 
             <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
                 .font-diary { font-family: 'Ma Shan Zheng', cursive; }
                 .scrollbar-hide::-webkit-scrollbar { display: none; }
             `}</style>
@@ -99,7 +105,6 @@ const App = () => {
                 {renderDecoration()}
             </div>
 
-            {/* 导航栏：务必确认传入了 cycleTheme */}
             <Navbar
                 isDark={isDark}
                 cycleTheme={cycleTheme}
@@ -108,19 +113,24 @@ const App = () => {
 
             <main className="relative z-10">
                 <Hero isLoaded={isLoaded} isDark={isDark} theme={theme} />
-                <Projects isDark={isDark} projects={projects} setSelectedProject={setSelectedProject} theme={theme} />
-                <TechStack isDark={isDark} theme={theme} />
-                <Contact isDark={isDark} theme={theme} />
-                <Diary isDark={isDark} theme={theme} />
+                
+                <Suspense fallback={<div className="h-40 flex items-center justify-center">Loading...</div>}>
+                    <Projects isDark={isDark} projects={projects} setSelectedProject={setSelectedProject} theme={theme} />
+                    <TechStack isDark={isDark} theme={theme} />
+                    <Contact isDark={isDark} theme={theme} />
+                    <Diary isDark={isDark} theme={theme} />
+                </Suspense>
             </main>
 
             <Footer isDark={isDark} theme={theme} />
 
-            {selectedProject && (
-                <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} isDark={isDark} theme={theme} />
-            )}
+            <Suspense fallback={null}>
+                {selectedProject && (
+                    <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} isDark={isDark} theme={theme} />
+                )}
+            </Suspense>
         </div>
     );
 };
 
-export default App;
+export default App;

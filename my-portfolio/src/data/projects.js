@@ -8,6 +8,27 @@ import mathQuizLiteImg from '../assets/mathquizlite.jpg';
 
 export const projects = [
     {
+        id: "math-quiz-ecosystem",
+        title: "CountDownTodo — 多端数据协同平台",
+        shortDesc: "覆盖桌面与移动端的全生态效率工具。PC 端追求极致轻量，移动端提供丰富交互，数据通过 Cloudflare 边缘网络实时同步。",
+        image: mathQuizLiteImg,
+        tags: ["C++", "Flutter", "Cloudflare D1", "多端同步"],
+        category: "fullstack",
+        links: [
+            { label: "查看官网", url: "https://countdowntodo.junpgle.me" },
+        ],
+        details: {
+            methodology: "针对不同终端特性采用差异化技术栈：桌面端使用底层 Win32/GDI+ 打造 KB 级内存占用的常驻挂件；移动端基于 Flutter 构建 Material 3 沉浸式体验。通过统一的 RESTful API 和时间戳冲突解决策略（Last-Write-Wins + 乐观 UI）实现多端数据一致性。",
+            features: [
+                "多端协同：无论在电脑还是手机上添加待办、倒计时或完成测验，数据毫秒级同步，支持断网操作与自动重试。",
+                "桌面端 (Lite)：C++ 原生开发，无依赖单文件运行。支持高分屏自适应、Layered Window 透明磨砂渲染及全局热键。",
+                "移动端/桌面端 (Pro)：Flutter 打造，集成动态必应/GitHub 壁纸、后台自动更新、通知提醒、课程导入、番茄钟、时间日志等。",
+                "手环端(vela Band):quick app开发,支持同步手机待办、倒计时、课程表。"
+            ],
+            tech: "Desktop: C++17, Win32 API, GDI+; Mobile: Flutter, Dart, SQLite; Backend: Cloudflare Workers, D1 Database."
+        }
+    },
+    {
         id: "learnword",
         title: "LearnWord — 智能单词记忆工具",
         shortDesc: "基于三阶段记忆闭环（认知→自测→输出）的科学记忆工具，结合算法驱动复习逻辑。",
@@ -101,26 +122,6 @@ export const projects = [
                 "数据回溯：自动记录每次测验的详细答卷（包含题目、用户答案、正确答案及判定结果），方便随时查阅历史记录。"
             ],
             tech: "C++17, Qt 6 (Widgets), QFile/QTextStream, Custom Sorting Algorithms"
-        }
-    },
-    {
-        id: "math-quiz-ecosystem",
-        title: "Countdown&Todo — 多端数据协同平台",
-        shortDesc: "覆盖桌面与移动端的全生态效率工具。PC 端追求极致轻量，移动端提供丰富交互，数据通过 Cloudflare 边缘网络实时同步。",
-        image: mathQuizLiteImg,
-        tags: ["C++", "Flutter", "Cloudflare D1", "多端同步"],
-        category: "fullstack",
-        links: [
-            { label: "查看官网", url: "https://countdowntodo.junpgle.me" },
-        ],
-        details: {
-            methodology: "针对不同终端特性采用差异化技术栈：桌面端使用底层 Win32/GDI+ 打造 KB 级内存占用的常驻挂件；移动端基于 Flutter 构建 Material 3 沉浸式体验。通过统一的 RESTful API 和时间戳冲突解决策略（Last-Write-Wins + 乐观 UI）实现多端数据一致性。",
-            features: [
-                "双端协同：无论在电脑还是手机上添加待办、倒计时或完成测验，数据毫秒级同步，支持断网操作与自动重试。",
-                "桌面端 (Lite)：C++ 原生开发，无依赖单文件运行。支持高分屏自适应、Layered Window 透明磨砂渲染及全局热键。",
-                "移动端 (Pro)：Flutter 打造，集成动态必应/GitHub 壁纸、后台自动更新、通知提醒及可视化数学能力分析报告。"
-            ],
-            tech: "Desktop: C++17, Win32 API, GDI+; Mobile: Flutter, Dart, SQLite; Backend: Cloudflare Workers, D1 Database."
         }
     }
 ];

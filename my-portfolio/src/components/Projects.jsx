@@ -55,6 +55,8 @@ const Projects = ({ isDark, projects, setSelectedProject, theme }) => {
                                 <img
                                     src={project.image}
                                     alt={project.title}
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100"
                                 />
 
